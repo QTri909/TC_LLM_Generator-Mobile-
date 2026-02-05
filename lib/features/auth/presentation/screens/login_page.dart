@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../../../../core/constants/app_colors.dart';
 import 'package:provider/provider.dart';
 import '../providers/auth_provider.dart';
+import 'token_display_page.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -187,8 +188,22 @@ class _LoginPageState extends State<LoginPage> {
                     width: double.infinity,
                     height: 56,
                     child: OutlinedButton(
-                      onPressed: () {
-                        context.read<AuthProvider>().loginWithGoogle();
+                      onPressed: () async {
+                        final authProvider = context.read<AuthProvider>();
+                        await authProvider.loginWithGoogle();
+
+                        if (context.mounted &&
+                            authProvider.authEntity != null &&
+                            authProvider.errorMessage == null) {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => TokenDisplayPage(
+                                authEntity: authProvider.authEntity!,
+                              ),
+                            ),
+                          );
+                        }
                       },
                       style: OutlinedButton.styleFrom(
                         backgroundColor: Colors.white,

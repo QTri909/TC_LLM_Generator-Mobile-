@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../domain/entities/auth_entity.dart';
 import '../../domain/repositories/auth_repository.dart';
 
 class AuthProvider extends ChangeNotifier {
@@ -12,13 +13,16 @@ class AuthProvider extends ChangeNotifier {
   String? _errorMessage;
   String? get errorMessage => _errorMessage;
 
+  AuthEntity? _authEntity;
+  AuthEntity? get authEntity => _authEntity;
+
   Future<void> loginWithGoogle() async {
     _isLoading = true;
     _errorMessage = null;
     notifyListeners();
 
     try {
-      await authRepository.loginWithGoogle();
+      _authEntity = await authRepository.loginWithGoogle();
     } catch (e) {
       _errorMessage = e.toString();
     } finally {
