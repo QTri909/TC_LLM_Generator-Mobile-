@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../../core/constants/app_colors.dart';
+import 'package:provider/provider.dart';
+import '../providers/auth_provider.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -162,40 +164,61 @@ class _LoginPageState extends State<LoginPage> {
               ),
 
               // Google Sign In Button
-              SizedBox(
-                width: double.infinity,
-                height: 56,
-                child: OutlinedButton(
-                  onPressed: () {},
-                  style: OutlinedButton.styleFrom(
-                    backgroundColor: Colors.white,
-                    side: const BorderSide(color: AppColors.border),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                  ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      // Placeholder for Google Icon since we don't have assets yet
-                      // Using a colored G icon representation
-                      const Icon(
-                        Icons.g_mobiledata,
-                        color: AppColors.primary,
-                        size: 32,
-                      ),
-                      const SizedBox(width: 8),
-                      const Text(
-                        'Sign in with Google',
-                        style: TextStyle(
-                          color: AppColors.textDark,
-                          fontSize: 16,
-                          fontWeight: FontWeight.w500,
+              Consumer<AuthProvider>(
+                builder: (context, authProvider, child) {
+                  if (authProvider.isLoading) {
+                    return const SizedBox(
+                      height: 56,
+                      child: Center(child: CircularProgressIndicator()),
+                    );
+                  }
+
+                  if (authProvider.errorMessage != null) {
+                    // Optionally show usage of error message, e.g. defined in a SnackBar or text
+                    WidgetsBinding.instance.addPostFrameCallback((_) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text(authProvider.errorMessage!)),
+                      );
+                      authProvider.clearError();
+                    });
+                  }
+
+                  return SizedBox(
+                    width: double.infinity,
+                    height: 56,
+                    child: OutlinedButton(
+                      onPressed: () {
+                        context.read<AuthProvider>().loginWithGoogle();
+                      },
+                      style: OutlinedButton.styleFrom(
+                        backgroundColor: Colors.white,
+                        side: const BorderSide(color: AppColors.border),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
                         ),
                       ),
-                    ],
-                  ),
-                ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          const Icon(
+                            Icons.g_mobiledata,
+                            color: AppColors.primary,
+                            size: 32,
+                          ),
+                          const SizedBox(width: 8),
+                          const Text(
+                            'Sign in with Google',
+                            style: TextStyle(
+                              color: AppColors.textDark,
+                              fontSize: 16,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  );
+                },
               ),
 
               const SizedBox(height: 40),
