@@ -1,8 +1,16 @@
 import 'package:flutter/material.dart';
 import '../../../../core/constants/app_colors.dart';
-import 'package:provider/provider.dart';
-import '../providers/auth_provider.dart';
-import 'token_display_page.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import '../../../home/presentation/screens/workspace_page.dart';
+import 'package:http/http.dart' as http;
+import '../../../home/data/datasources/workspace_remote_data_source.dart';
+import '../../../home/data/repositories/workspace_repository_impl.dart';
+import '../../../home/domain/usecases/get_workspaces.dart';
+import '../../../home/presentation/bloc/workspace_bloc.dart';
+import '../../../home/presentation/bloc/workspace_event.dart';
+import '../../presentation/bloc/auth_bloc.dart';
+import '../../presentation/bloc/auth_event.dart';
+import '../../presentation/bloc/auth_state.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -165,45 +173,59 @@ class _LoginPageState extends State<LoginPage> {
               ),
 
               // Google Sign In Button
-              Consumer<AuthProvider>(
-                builder: (context, authProvider, child) {
-                  if (authProvider.isLoading) {
+              // Google Sign In Button
+              BlocConsumer<AuthBloc, AuthState>(
+                listener: (context, state) {
+                  if (state is AuthError) {
+                    ScaffoldMessenger.of(
+                      context,
+                    ).showSnackBar(SnackBar(content: Text(state.message)));
+                  } else if (state is AuthAuthenticated) {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) {
+                          // Simple Manual DI for Workspace Feature
+                          final client = http.Client();
+                          final remoteDataSource = WorkspaceRemoteDataSource(
+                            client: client,
+                          );
+                          final repository = WorkspaceRepositoryImpl(
+                            remoteDataSource: remoteDataSource,
+                          );
+                          final getWorkspaces = GetWorkspaces(repository);
+
+                          return BlocProvider(
+                            create: (context) =>
+                                WorkspaceBloc(getWorkspaces: getWorkspaces)
+                                  ..add(
+                                    GetWorkspacesEvent(
+                                      accessToken: state.authEntity.accessToken,
+                                    ),
+                                  ),
+                            child: WorkspacePage(
+                              accessToken: state.authEntity.accessToken,
+                            ),
+                          );
+                        },
+                      ),
+                    );
+                  }
+                },
+                builder: (context, state) {
+                  if (state is AuthLoading) {
                     return const SizedBox(
                       height: 56,
                       child: Center(child: CircularProgressIndicator()),
                     );
                   }
 
-                  if (authProvider.errorMessage != null) {
-                    // Optionally show usage of error message, e.g. defined in a SnackBar or text
-                    WidgetsBinding.instance.addPostFrameCallback((_) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text(authProvider.errorMessage!)),
-                      );
-                      authProvider.clearError();
-                    });
-                  }
-
                   return SizedBox(
                     width: double.infinity,
                     height: 56,
                     child: OutlinedButton(
-                      onPressed: () async {
-                        final authProvider = context.read<AuthProvider>();
-                        await authProvider.loginWithGoogle();
-
-                        if (context.mounted &&
-                            authProvider.authEntity != null &&
-                            authProvider.errorMessage == null) {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => TokenDisplayPage(
-                                authEntity: authProvider.authEntity!,
-                              ),
-                            ),
-                          );
-                        }
+                      onPressed: () {
+                        context.read<AuthBloc>().add(LoginWithGoogleEvent());
                       },
                       style: OutlinedButton.styleFrom(
                         backgroundColor: Colors.white,

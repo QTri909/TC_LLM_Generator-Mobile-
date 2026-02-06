@@ -3,12 +3,17 @@ import '../../domain/entities/auth_entity.dart';
 import '../../domain/repositories/auth_repository.dart';
 import '../datasources/auth_remote_data_source.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import '../datasources/auth_local_data_source.dart';
 
 class AuthRepositoryImpl implements AuthRepository {
   final AuthRemoteDataSource remoteDataSource;
+  final AuthLocalDataSource localDataSource;
   final GoogleSignIn _googleSignIn = GoogleSignIn.instance;
 
-  AuthRepositoryImpl({required this.remoteDataSource});
+  AuthRepositoryImpl({
+    required this.remoteDataSource,
+    required this.localDataSource,
+  });
 
   @override
   Future<AuthEntity> loginWithGoogle() async {
@@ -31,5 +36,13 @@ class AuthRepositoryImpl implements AuthRepository {
     } catch (e) {
       rethrow;
     }
+  }
+
+  @override
+  Future<void> saveTokens(String accessToken, String refreshToken) async {
+    await localDataSource.saveTokens(
+      accessToken: accessToken,
+      refreshToken: refreshToken,
+    );
   }
 }
