@@ -33,3 +33,44 @@ class WorkspaceError extends WorkspaceState {
   @override
   List<Object> get props => [message];
 }
+
+class WorkspaceCreateLoading extends WorkspaceState {}
+
+class WorkspaceCreateSuccess extends WorkspaceState {
+  final WorkspaceEntity workspace;
+
+  const WorkspaceCreateSuccess({required this.workspace});
+
+  @override
+  List<Object> get props => [workspace];
+}
+
+class WorkspaceCreateError extends WorkspaceState {
+  final String message;
+
+  const WorkspaceCreateError({required this.message});
+
+  @override
+  List<Object> get props => [message];
+}
+
+class ProjectCreateLoading extends WorkspaceState {}
+
+class ProjectCreateSuccess extends WorkspaceState {
+  final WorkspaceEntity workspace;
+
+  const ProjectCreateSuccess({required this.workspace});
+
+  @override
+  List<Object> get props => [workspace];
+}
+
+class ProjectCreateError extends WorkspaceState {
+  final String message;
+
+  const ProjectCreateError({required this.message});
+
+  @override
+  List<Object> get props => [message];
+}
+

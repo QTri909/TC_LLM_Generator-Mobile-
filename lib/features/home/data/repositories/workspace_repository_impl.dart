@@ -11,4 +11,35 @@ class WorkspaceRepositoryImpl implements WorkspaceRepository {
   Future<List<WorkspaceEntity>> getMyWorkspaces(String accessToken) async {
     return await remoteDataSource.getMyWorkspaces(accessToken);
   }
+
+  @override
+  Future<WorkspaceEntity> createWorkspace(
+    String accessToken,
+    String name,
+    String? description,
+  ) async {
+    return await remoteDataSource.createWorkspace(
+      accessToken,
+      name,
+      description,
+    );
+  }
+
+  @override
+  Future<WorkspaceEntity> createProject(
+    String accessToken,
+    String workspaceId,
+    String name,
+    String? description,
+    List<Map<String, dynamic>>? businessRules,
+  ) async {
+    return await remoteDataSource.createProject(
+      accessToken,
+      workspaceId,
+      name,
+      description,
+      businessRules,
+    );
+  }
 }
+

@@ -1,11 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import '../../../../core/constants/app_colors.dart';
 import '../../domain/entities/project_entity.dart';
 import '../../domain/entities/workspace_entity.dart';
 import '../../presentation/bloc/workspace_bloc.dart';
 import '../../presentation/bloc/workspace_event.dart';
 import '../../presentation/bloc/workspace_state.dart';
+import '../widgets/create_workspace_sheet.dart';
+import '../../../project/presentation/screens/project_detail_page.dart';
+import '../screens/create_project_page.dart';
 
 class WorkspacePage extends StatefulWidget {
   final String accessToken;
@@ -34,10 +38,71 @@ class _WorkspacePageState extends State<WorkspacePage> {
         },
       ),
       bottomNavigationBar: _buildBottomNavigationBar(),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {},
+      floatingActionButton: SpeedDial(
+        icon: Icons.add,
+        activeIcon: Icons.close,
         backgroundColor: AppColors.primary,
-        child: const Icon(Icons.add, color: Colors.white),
+        foregroundColor: Colors.white,
+        activeBackgroundColor: AppColors.primary,
+        activeForegroundColor: Colors.white,
+        spacing: 12,
+        spaceBetweenChildren: 8,
+        overlayColor: Colors.black,
+        overlayOpacity: 0.5,
+        elevation: 8,
+        animationDuration: const Duration(milliseconds: 350),
+        animationCurve: Curves.easeInOut,
+        children: [
+          SpeedDialChild(
+            child: const Icon(Icons.folder_open),
+            backgroundColor: Colors.white,
+            foregroundColor: AppColors.primary,
+            label: 'New Project',
+            labelStyle: const TextStyle(
+              fontWeight: FontWeight.w600,
+              color: AppColors.textDark,
+            ),
+            labelBackgroundColor: Colors.white,
+            onTap: () {
+              final currentState = context.read<WorkspaceBloc>().state;
+              if (currentState is WorkspaceLoaded &&
+                  currentState.selectedWorkspace != null) {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (ctx) => BlocProvider.value(
+                      value: context.read<WorkspaceBloc>(),
+                      child: CreateProjectPage(
+                        accessToken: widget.accessToken,
+                        workspaceId: currentState.selectedWorkspace!.id,
+                      ),
+                    ),
+                  ),
+                );
+              } else {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text('Please select a workspace first'),
+                  ),
+                );
+              }
+            },
+          ),
+          SpeedDialChild(
+            child: const Icon(Icons.workspaces_outline),
+            backgroundColor: Colors.white,
+            foregroundColor: AppColors.primary,
+            label: 'New Workspace',
+            labelStyle: const TextStyle(
+              fontWeight: FontWeight.w600,
+              color: AppColors.textDark,
+            ),
+            labelBackgroundColor: Colors.white,
+            onTap: () {
+              showCreateWorkspaceSheet(context, widget.accessToken);
+            },
+          ),
+        ],
       ),
     );
   }
@@ -288,147 +353,156 @@ class _WorkspacePageState extends State<WorkspacePage> {
   }
 
   Widget _buildProjectCard(ProjectEntity project) {
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: AppColors.border),
-      ),
-      padding: const EdgeInsets.all(16),
-      child: Column(
-        children: [
-          Row(
-            children: [
-              Container(
-                width: 40,
-                height: 40,
-                decoration: BoxDecoration(
-                  color: AppColors.primary,
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: const Icon(Icons.smartphone, color: Colors.white),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      project.name,
-                      style: const TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                        color: AppColors.textDark,
-                      ),
-                    ),
-                    Text(
-                      'Updated ${project.updatedAt.toString().split(' ')[0]}',
-                      style: const TextStyle(
-                        fontSize: 12,
-                        color: AppColors.textGrey,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              if (project.status == 'ACTIVE')
+    return GestureDetector(
+      onTap: () {
+        Navigator.of(context).push(
+          MaterialPageRoute(
+            builder: (context) => ProjectDetailPage(project: project),
+          ),
+        );
+      },
+      child: Container(
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: AppColors.border),
+        ),
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          children: [
+            Row(
+              children: [
                 Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 8,
-                    vertical: 2,
-                  ),
+                  width: 40,
+                  height: 40,
                   decoration: BoxDecoration(
-                    color: AppColors.primary.withOpacity(0.1),
-                    borderRadius: BorderRadius.circular(8),
+                    color: AppColors.primary,
+                    borderRadius: BorderRadius.circular(12),
                   ),
-                  child: Row(
+                  child: const Icon(Icons.smartphone, color: Colors.white),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Icon(
-                        Icons.auto_awesome,
-                        size: 12,
-                        color: AppColors.primary,
-                      ),
-                      const SizedBox(width: 4),
                       Text(
-                        project.status,
+                        project.name,
                         style: const TextStyle(
-                          fontSize: 10,
+                          fontSize: 16,
                           fontWeight: FontWeight.bold,
-                          color: AppColors.primary,
+                          color: AppColors.textDark,
+                        ),
+                      ),
+                      Text(
+                        'Updated ${project.updatedAt.toString().split(' ')[0]}',
+                        style: const TextStyle(
+                          fontSize: 12,
+                          color: AppColors.textGrey,
                         ),
                       ),
                     ],
                   ),
                 ),
-            ],
-          ),
-          const SizedBox(height: 16),
-          const Divider(height: 1, color: AppColors.border),
-          const SizedBox(height: 12),
-          const Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: [
-              // Fake stats since we assume default project structure
-              _StatItem(value: "12", label: "Stories"),
-              _StatItem(value: "88", label: "Tests"),
-              _StatItem(value: "AI", label: "Generating", isPrimary: true),
-            ],
-          ),
-          const SizedBox(height: 16),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              SizedBox(
-                height: 24,
-                child: ListView.builder(
-                  scrollDirection: Axis.horizontal,
-                  shrinkWrap: true,
-                  itemCount: project.members.length > 3
-                      ? 4
-                      : project.members.length,
-                  itemBuilder: (context, index) {
-                    return Container(
-                      width: 24,
-                      height: 24,
-                      margin: const EdgeInsets.only(right: 4),
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: Colors.grey[200],
-                        border: Border.all(color: Colors.white, width: 2),
-                      ),
-                      // Placeholder for avatar
-                      child: const Icon(
-                        Icons.person,
-                        size: 16,
-                        color: Colors.grey,
-                      ),
-                    );
-                  },
-                ),
-              ),
-              Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 16,
-                  vertical: 8,
-                ),
-                decoration: BoxDecoration(
-                  color: AppColors.primary.withOpacity(0.05),
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: const Text(
-                  'View Details',
-                  style: TextStyle(
-                    color: AppColors.primary,
-                    fontWeight: FontWeight.bold,
-                    fontSize: 12,
+                if (project.status == 'ACTIVE')
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 8,
+                      vertical: 2,
+                    ),
+                    decoration: BoxDecoration(
+                      color: AppColors.primary.withOpacity(0.1),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Row(
+                      children: [
+                        const Icon(
+                          Icons.auto_awesome,
+                          size: 12,
+                          color: AppColors.primary,
+                        ),
+                        const SizedBox(width: 4),
+                        Text(
+                          project.status,
+                          style: const TextStyle(
+                            fontSize: 10,
+                            fontWeight: FontWeight.bold,
+                            color: AppColors.primary,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+              ],
+            ),
+            const SizedBox(height: 16),
+            const Divider(height: 1, color: AppColors.border),
+            const SizedBox(height: 12),
+            const Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: [
+                // Fake stats since we assume default project structure
+                _StatItem(value: "12", label: "Stories"),
+                _StatItem(value: "88", label: "Tests"),
+                _StatItem(value: "AI", label: "Generating", isPrimary: true),
+              ],
+            ),
+            const SizedBox(height: 16),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                SizedBox(
+                  height: 24,
+                  child: ListView.builder(
+                    scrollDirection: Axis.horizontal,
+                    shrinkWrap: true,
+                    itemCount: project.members.length > 3
+                        ? 4
+                        : project.members.length,
+                    itemBuilder: (context, index) {
+                      return Container(
+                        width: 24,
+                        height: 24,
+                        margin: const EdgeInsets.only(right: 4),
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: Colors.grey[200],
+                          border: Border.all(color: Colors.white, width: 2),
+                        ),
+                        // Placeholder for avatar
+                        child: const Icon(
+                          Icons.person,
+                          size: 16,
+                          color: Colors.grey,
+                        ),
+                      );
+                    },
                   ),
                 ),
-              ),
-            ],
-          ),
-        ],
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 8,
+                  ),
+                  decoration: BoxDecoration(
+                    color: AppColors.primary.withOpacity(0.05),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: const Text(
+                    'View Details',
+                    style: TextStyle(
+                      color: AppColors.primary,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 12,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
       ),
-    );
+    ); // Close GestureDetector
   }
 
   Widget _buildBottomNavigationBar() {
@@ -442,8 +516,8 @@ class _WorkspacePageState extends State<WorkspacePage> {
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [
           _buildNavItem(Icons.grid_view, 'Dashboard', isActive: true),
-          _buildNavItem(Icons.play_circle_outline, 'Runs'),
-          _buildNavItem(Icons.analytics_outlined, 'Reports'),
+          _buildNavItem(Icons.people_outline, 'Teams'),
+          _buildNavItem(Icons.library_books_outlined, 'Library'),
           _buildNavItem(Icons.settings_outlined, 'Settings'),
         ],
       ),

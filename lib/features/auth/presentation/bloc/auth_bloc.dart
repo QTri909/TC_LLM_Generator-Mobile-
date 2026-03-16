@@ -26,6 +26,13 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
 
       emit(AuthAuthenticated(authEntity: authEntity));
     } catch (e) {
+      // If the user dismissed the Google Sign In dialog, do not show an error
+      if (e.toString().contains('canceled') ||
+          e.toString().contains('sign_in_canceled') ||
+          e.toString().contains('GoogleSignInExceptionCode.canceled')) {
+        emit(AuthInitial());
+        return;
+      }
       emit(AuthError(message: e.toString()));
     }
   }

@@ -5,6 +5,8 @@ import '../../../home/presentation/screens/workspace_page.dart';
 import 'package:http/http.dart' as http;
 import '../../../home/data/datasources/workspace_remote_data_source.dart';
 import '../../../home/data/repositories/workspace_repository_impl.dart';
+import '../../../home/domain/usecases/create_project.dart';
+import '../../../home/domain/usecases/create_workspace.dart';
 import '../../../home/domain/usecases/get_workspaces.dart';
 import '../../../home/presentation/bloc/workspace_bloc.dart';
 import '../../../home/presentation/bloc/workspace_event.dart';
@@ -194,15 +196,20 @@ class _LoginPageState extends State<LoginPage> {
                             remoteDataSource: remoteDataSource,
                           );
                           final getWorkspaces = GetWorkspaces(repository);
+                          final createWorkspace = CreateWorkspace(repository);
+                          final createProject = CreateProject(repository);
 
                           return BlocProvider(
                             create: (context) =>
-                                WorkspaceBloc(getWorkspaces: getWorkspaces)
-                                  ..add(
-                                    GetWorkspacesEvent(
-                                      accessToken: state.authEntity.accessToken,
-                                    ),
+                                WorkspaceBloc(
+                                  getWorkspaces: getWorkspaces,
+                                  createWorkspace: createWorkspace,
+                                  createProject: createProject,
+                                )..add(
+                                  GetWorkspacesEvent(
+                                    accessToken: state.authEntity.accessToken,
                                   ),
+                                ),
                             child: WorkspacePage(
                               accessToken: state.authEntity.accessToken,
                             ),

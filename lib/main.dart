@@ -10,28 +10,89 @@ import 'package:automation_generate_tc/features/auth/data/repositories/auth_repo
 import 'package:automation_generate_tc/features/auth/domain/repositories/auth_repository.dart';
 import 'package:automation_generate_tc/features/auth/presentation/bloc/auth_bloc.dart';
 
-void main() async {
-  await dotenv.load(fileName: ".env");
-  runApp(const MyApp());
+void main() {
+  WidgetsFlutterBinding.ensureInitialized();
+  runApp(const InitializerApp());
 }
 
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+class InitializerApp extends StatefulWidget {
+  const InitializerApp({super.key});
+
+  @override
+  State<InitializerApp> createState() => _InitializerAppState();
+}
+
+class _InitializerAppState extends State<InitializerApp> {
+  AuthRepository? _authRepository;
+  dynamic _error;
+
+  @override
+  void initState() {
+    super.initState();
+    _initDependencies();
+  }
+
+  Future<void> _initDependencies() async {
+    try {
+      await dotenv.load(fileName: ".env");
+
+      // 1. KHỞI TẠO DEPENDENCIES Ở ĐÂY
+      final client = http.Client();
+      const secureStorage = FlutterSecureStorage();
+      final authRemoteDataSource = AuthRemoteDataSource(client: client);
+      final authLocalDataSource = AuthLocalDataSource(
+        secureStorage: secureStorage,
+      );
+      final authRepository = AuthRepositoryImpl(
+        remoteDataSource: authRemoteDataSource,
+        localDataSource: authLocalDataSource,
+      );
+
+      // Trigger rebuild với Repository đã khởi tạo
+      setState(() {
+        _authRepository = authRepository;
+      });
+    } catch (e, stacktrace) {
+      debugPrint("App initialization error: $e");
+      debugPrint("$stacktrace");
+      setState(() {
+        _error = e;
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
-    // Initializing dependencies
-    final client = http.Client();
-    final secureStorage = const FlutterSecureStorage();
-    final authRemoteDataSource = AuthRemoteDataSource(client: client);
-    final authLocalDataSource = AuthLocalDataSource(
-      secureStorage: secureStorage,
-    );
-    final authRepository = AuthRepositoryImpl(
-      remoteDataSource: authRemoteDataSource,
-      localDataSource: authLocalDataSource,
-    );
+    if (_error != null) {
+      return MaterialApp(
+        home: Scaffold(body: Center(child: Text("Error: $_error"))),
+      );
+    }
 
+    if (_authRepository == null) {
+      return const MaterialApp(
+        debugShowCheckedModeBanner: false,
+        home: Scaffold(
+          backgroundColor: Colors.white,
+          body: Center(child: CircularProgressIndicator()),
+        ),
+      );
+    }
+
+    // 2. Truyền Repository đã khởi tạo vào MyApp
+    return MyApp(authRepository: _authRepository!);
+  }
+}
+
+class MyApp extends StatelessWidget {
+  final AuthRepository authRepository;
+
+  // 3. Nhận Repository qua constructor
+  const MyApp({super.key, required this.authRepository});
+
+  @override
+  Widget build(BuildContext context) {
+    // Hàm build giờ đây đã rất nhẹ nhàng, chỉ làm nhiệm vụ vẽ UI
     return RepositoryProvider<AuthRepository>.value(
       value: authRepository,
       child: BlocProvider(

@@ -1,0 +1,203 @@
+{
+  "workspaces": [
+    {
+      "id": "mock-workspace-id-1",
+      "ownerId": "mock-owner-id-1",
+      "name": "My Mocked Workspace",
+      "description": "This is a temporary mocked workspace for testing the app UI.",
+      "createdAt": "2026-03-10T00:00:00.000Z",
+      "updatedAt": "2026-03-10T00:00:00.000Z",
+      "projects": [
+        {
+          "id": "mock-project-id-1",
+          "workspaceId": "mock-workspace-id-1",
+          "createdByUserId": "mock-owner-id-1",
+          "projectKey": "MOCK1",
+          "name": "Mock Database Project",
+          "description": "Mocked project for testing.",
+          "status": "ACTIVE",
+          "createdAt": "2026-03-10T00:00:00.000Z",
+          "updatedAt": "2026-03-10T00:00:00.000Z",
+          "members": []
+        },
+        {
+          "id": "mock-project-id-2",
+          "workspaceId": "mock-workspace-id-1",
+          "createdByUserId": "mock-owner-id-1",
+          "projectKey": "MOCK2",
+          "name": "Mock Frontend Project",
+          "description": "A frontend UI project.",
+          "status": "ACTIVE",
+          "createdAt": "2026-03-10T00:00:00.000Z",
+          "updatedAt": "2026-03-10T00:00:00.000Z",
+          "members": []
+        }
+      ]
+    },
+    {
+      "id": "mock_1773140922317",
+      "ownerId": "mock_owner",
+      "name": "haha",
+      "description": "ds",
+      "createdAt": "2026-03-10T11:08:42.317Z",
+      "updatedAt": "2026-03-10T11:08:42.317Z",
+      "projects": []
+    },
+    {
+      "id": "mock_1773141792652",
+      "ownerId": "mock_owner",
+      "name": "test",
+      "description": "test",
+      "createdAt": "2026-03-10T11:23:12.653Z",
+      "updatedAt": "2026-03-10T11:23:12.653Z",
+      "projects": []
+    },
+    {
+      "id": "mock_1773385131680",
+      "ownerId": "mock_owner",
+      "name": "test1",
+      "description": null,
+      "createdAt": "2026-03-13T06:58:51.681Z",
+      "updatedAt": "2026-03-13T06:58:51.681Z",
+      "projects": []
+    }
+  ],
+  "projects": [],
+  "businessRules": [],
+  "stories": [
+    {
+      "id": "US-204",
+      "projectId": "mock-project-id-1",
+      "title": "log in with biometric authentication",
+      "asA": "returning user",
+      "iWantTo": "log in with biometric authentication",
+      "soThat": "I can access my account faster.",
+      "status": "IN_PROGRESS",
+      "acceptanceCriteria": [
+        {
+          "id": "ac-1",
+          "text": "Show biometric prompt on app launch if enabled in settings.",
+          "isCompleted": true
+        },
+        {
+          "id": "ac-2",
+          "text": "Fallback to PIN entry if biometric fails after 3 attempts.",
+          "isCompleted": true
+        },
+        {
+          "id": "ac-3",
+          "text": "Provide toggle in Profile settings to enable/disable feature.",
+          "isCompleted": false
+        }
+      ],
+      "stats": {
+        "completedAc": 2,
+        "totalAc": 3
+      },
+      "colorTheme": "blue",
+      "isAiReady": false
+    },
+    {
+      "id": "US-205",
+      "projectId": "mock-project-id-1",
+      "title": "As a new user, I want to see a walkthrough of the app features so that I understand how to navigate.",
+      "asA": "new user",
+      "iWantTo": "see a walkthrough of the app features",
+      "soThat": "I understand how to navigate.",
+      "status": "TODO",
+      "acceptanceCriteria": [],
+      "stats": {
+        "totalAc": 5,
+        "totalTests": 12
+      },
+      "colorTheme": "orange",
+      "isAiReady": false
+    },
+    {
+      "id": "US-206",
+      "projectId": "mock-project-id-1",
+      "title": "As a customer, I want to receive push notifications for my transactions so that I can monitor my spending in real-time.",
+      "asA": "customer",
+      "iWantTo": "receive push notifications for my transactions",
+      "soThat": "I can monitor my spending in real-time.",
+      "status": "TODO",
+      "acceptanceCriteria": [],
+      "stats": {
+        "totalAc": 4
+      },
+      "colorTheme": "purple",
+      "isAiReady": true
+    },
+    {
+      "id": "US-7373",
+      "projectId": "mock-project-id-1",
+      "title": "Login",
+      "role": "user",
+      "action": "login to TC system",
+      "reason": "I can create TC",
+      "priority": "Medium",
+      "points": 3,
+      "acceptanceCriteria": [
+        "Testing"
+      ],
+      "createdAt": "2026-03-11T08:55:57.021Z",
+      "updatedAt": "2026-03-11T08:55:57.024Z"
+    },
+    {
+      "id": "US-5019",
+      "projectId": "mock-project-id-1",
+      "title": "Order",
+      "role": "customer",
+      "action": "order coffe",
+      "reason": "i can drink it",
+      "priority": "Medium",
+      "points": 3,
+      "acceptanceCriteria": [
+        "the user can see status"
+      ],
+      "createdAt": "2026-03-11T15:18:27.124Z",
+      "updatedAt": "2026-03-11T15:18:27.125Z"
+    }
+  ],
+  "testSuites": [
+    {
+      "id": "ts-1",
+      "projectId": "mock-project-id-1",
+      "name": "Regression Suite Q4",
+      "description": "Full regression test suite for Q4 release cycle",
+      "count": 45,
+      "testCaseIds": [
+        "TC-01",
+        "TC-02",
+        "TC-03"
+      ],
+      "createdAt": "2026-03-10T00:00:00.000Z"
+    },
+    {
+      "id": "ts-2",
+      "projectId": "mock-project-id-1",
+      "name": "Smoke Test - Production",
+      "description": "Critical path validation before production deployment",
+      "count": 12,
+      "testCaseIds": [
+        "TC-01",
+        "TC-05"
+      ],
+      "createdAt": "2026-03-12T00:00:00.000Z"
+    }
+  ],
+  "testPlans": [
+    {
+      "id": "tp-1",
+      "projectId": "mock-project-id-1",
+      "name": "Sprint 16 Test Plan",
+      "description": "Primary test plan for upcoming release",
+      "status": "ACTIVE",
+      "createdAt": "2026-03-14T00:00:00.000Z",
+      "suites": [
+        "ts-1",
+        "ts-2"
+      ]
+    }
+  ]
+}

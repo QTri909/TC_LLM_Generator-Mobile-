@@ -42,6 +42,7 @@ dependencies:
   flutter_dotenv: ^6.0.0
   flutter_bloc: ^9.1.1
   equatable: ^2.0.8
+  flutter_speed_dial: ^7.0.0
 
 dev_dependencies:
   flutter_test:
