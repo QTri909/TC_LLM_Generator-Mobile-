@@ -21,8 +21,6 @@ class _CreateStoryPageState extends State<CreateStoryPage> {
   final _roleController = TextEditingController();
   final _actionController = TextEditingController();
   final _reasonController = TextEditingController();
-  String _priority = 'Medium';
-  final _pointsController = TextEditingController(text: '3');
 
   @override
   void dispose() {
@@ -33,7 +31,6 @@ class _CreateStoryPageState extends State<CreateStoryPage> {
     _roleController.dispose();
     _actionController.dispose();
     _reasonController.dispose();
-    _pointsController.dispose();
     super.dispose();
   }
 
@@ -61,8 +58,6 @@ class _CreateStoryPageState extends State<CreateStoryPage> {
           role: _roleController.text,
           action: _actionController.text,
           reason: _reasonController.text,
-          priority: _priority,
-          points: int.tryParse(_pointsController.text) ?? 3,
           acceptanceCriteria: _acControllers
               .map((e) => e.text)
               .where((e) => e.isNotEmpty)
@@ -115,9 +110,9 @@ class _CreateStoryPageState extends State<CreateStoryPage> {
               const SnackBar(content: Text('Story created successfully!')),
             );
           } else if (state is StoryCreateError) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text(state.message)),
-            );
+            ScaffoldMessenger.of(
+              context,
+            ).showSnackBar(SnackBar(content: Text(state.message)));
           }
         },
         child: SingleChildScrollView(
@@ -132,10 +127,6 @@ class _CreateStoryPageState extends State<CreateStoryPage> {
                 _buildBDDSection(),
                 const SizedBox(height: 24),
                 _buildAcceptanceCriteriaSection(),
-                const SizedBox(height: 24),
-                const Divider(color: Color(0xFFF3F4F6), thickness: 1),
-                const SizedBox(height: 16),
-                _buildMetadataSection(),
                 const SizedBox(height: 40),
               ],
             ),
@@ -204,15 +195,27 @@ class _CreateStoryPageState extends State<CreateStoryPage> {
         children: [
           _buildBDDRow('AS A', 'Enter the user role...', _roleController),
           const SizedBox(height: 16),
-          _buildBDDRow('I WANT TO', 'Enter the desired action...', _actionController),
+          _buildBDDRow(
+            'I WANT TO',
+            'Enter the desired action...',
+            _actionController,
+          ),
           const SizedBox(height: 16),
-          _buildBDDRow('SO THAT', 'Enter the business benefit...', _reasonController),
+          _buildBDDRow(
+            'SO THAT',
+            'Enter the business benefit...',
+            _reasonController,
+          ),
         ],
       ),
     );
   }
 
-  Widget _buildBDDRow(String prefix, String hint, TextEditingController controller) {
+  Widget _buildBDDRow(
+    String prefix,
+    String hint,
+    TextEditingController controller,
+  ) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -296,7 +299,11 @@ class _CreateStoryPageState extends State<CreateStoryPage> {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          Icon(Icons.check_box_outline_blank, color: Colors.grey[400], size: 24),
+          Icon(
+            Icons.check_box_outline_blank,
+            color: Colors.grey[400],
+            size: 24,
+          ),
           const SizedBox(width: 12),
           Expanded(
             child: TextFormField(
@@ -323,7 +330,10 @@ class _CreateStoryPageState extends State<CreateStoryPage> {
                 ),
                 focusedBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(8),
-                  borderSide: const BorderSide(color: AppColors.primary, width: 1),
+                  borderSide: const BorderSide(
+                    color: AppColors.primary,
+                    width: 1,
+                  ),
                 ),
               ),
             ),
@@ -341,95 +351,5 @@ class _CreateStoryPageState extends State<CreateStoryPage> {
     );
   }
 
-  Widget _buildMetadataSection() {
-    return Row(
-      children: [
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const Text(
-                'PRIORITY',
-                style: TextStyle(
-                  fontSize: 11,
-                  fontWeight: FontWeight.bold,
-                  color: Color(0xFF64748B),
-                  letterSpacing: 1.5,
-                ),
-              ),
-              const SizedBox(height: 8),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(8),
-                  border: Border.all(color: Colors.grey[200]!),
-                ),
-                child: DropdownButtonHideUnderline(
-                  child: DropdownButton<String>(
-                    value: _priority,
-                    isExpanded: true,
-                    icon: const Icon(Icons.expand_more, color: Colors.grey),
-                    items: ['High', 'Medium', 'Low']
-                        .map((p) => DropdownMenuItem(value: p, child: Text(p, style: const TextStyle(fontSize: 14))))
-                        .toList(),
-                    onChanged: (val) {
-                      if (val != null) {
-                        setState(() {
-                          _priority = val;
-                        });
-                      }
-                    },
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
-        const SizedBox(width: 16),
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const Text(
-                'POINTS',
-                style: TextStyle(
-                  fontSize: 11,
-                  fontWeight: FontWeight.bold,
-                  color: Color(0xFF64748B),
-                  letterSpacing: 1.5,
-                ),
-              ),
-              const SizedBox(height: 8),
-              TextFormField(
-                controller: _pointsController,
-                keyboardType: TextInputType.number,
-                style: const TextStyle(fontSize: 14),
-                decoration: InputDecoration(
-                  filled: true,
-                  fillColor: Colors.white,
-                  contentPadding: const EdgeInsets.symmetric(
-                    horizontal: 12,
-                    vertical: 12,
-                  ),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8),
-                    borderSide: BorderSide(color: Colors.grey[200]!),
-                  ),
-                  enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8),
-                    borderSide: BorderSide(color: Colors.grey[200]!),
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8),
-                    borderSide: const BorderSide(color: AppColors.primary, width: 1),
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
-      ],
-    );
-  }
+
 }

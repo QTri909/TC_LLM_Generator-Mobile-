@@ -19,7 +19,7 @@ class ProjectModel extends ProjectEntity {
 
   factory ProjectModel.fromJson(Map<String, dynamic> json) {
     return ProjectModel(
-      id: json['id'] ?? '',
+      id: json['projectId'] ?? '',
       workspaceId: json['workspaceId'] ?? '',
       createdByUserId: json['createdByUserId'] ?? '',
       projectKey: json['projectKey'] ?? '',
@@ -30,10 +30,10 @@ class ProjectModel extends ProjectEntity {
       status: json['status'] ?? 'UNKNOWN',
       createdAt: json['createdAt'] != null
           ? DateTime.parse(json['createdAt'])
-          : DateTime.now(),
+          : (DateTime.now()),
       updatedAt: json['updatedAt'] != null
           ? DateTime.parse(json['updatedAt'])
-          : DateTime.now(),
+          : (DateTime.now()),
       members: json['members'] != null
           ? (json['members'] as List)
                 .map((e) => ProjectMemberModel.fromJson(e))

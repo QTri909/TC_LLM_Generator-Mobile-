@@ -20,8 +20,6 @@ class CreateStoryEvent extends StoryEvent {
   final String role;
   final String action;
   final String reason;
-  final String priority;
-  final int points;
   final List<String> acceptanceCriteria;
 
   CreateStoryEvent({
@@ -30,20 +28,16 @@ class CreateStoryEvent extends StoryEvent {
     required this.role,
     required this.action,
     required this.reason,
-    required this.priority,
-    required this.points,
     required this.acceptanceCriteria,
   });
 
   @override
   List<Object?> get props => [
-        projectId,
-        title,
-        role,
-        action,
-        reason,
-        priority,
-        points,
-        acceptanceCriteria,
-      ];
+    projectId,
+    title,
+    role,
+    action,
+    reason,
+    acceptanceCriteria,
+  ];
 }

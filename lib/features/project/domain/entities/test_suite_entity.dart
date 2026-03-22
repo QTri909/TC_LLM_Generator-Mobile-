@@ -20,5 +20,13 @@ class TestSuiteEntity extends Equatable {
   });
 
   @override
-  List<Object?> get props => [id, projectId, name, description, count, testCaseIds, createdAt];
+  List<Object?> get props => [
+    id,
+    projectId,
+    name,
+    description,
+    count,
+    testCaseIds,
+    createdAt,
+  ];
 }

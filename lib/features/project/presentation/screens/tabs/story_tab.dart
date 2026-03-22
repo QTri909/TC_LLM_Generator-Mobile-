@@ -7,11 +7,7 @@ class StoryTab extends StatelessWidget {
   final StoryEntity story;
   final String projectName;
 
-  const StoryTab({
-    super.key,
-    required this.story,
-    required this.projectName,
-  });
+  const StoryTab({super.key, required this.story, required this.projectName});
 
   @override
   Widget build(BuildContext context) {
@@ -43,9 +39,9 @@ class StoryTab extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(width: 6),
-                    const Text(
-                      'READY FOR TESTING',
-                      style: TextStyle(
+                    Text(
+                      story.status.toUpperCase().replaceAll('_', ' '),
+                      style: const TextStyle(
                         color: AppColors.primary,
                         fontSize: 10,
                         fontWeight: FontWeight.bold,
@@ -129,15 +125,24 @@ class StoryTab extends StatelessWidget {
                         ),
                       ),
                       const SizedBox(height: 16),
-                      _buildStoryClause('As a', story.role.isNotEmpty ? story.role : '...'),
+                      _buildStoryClause(
+                        'As a',
+                        story.role.isNotEmpty ? story.role : '...',
+                      ),
                       const SizedBox(height: 12),
                       const Divider(height: 1, color: Color(0xFFF9FAFB)),
                       const SizedBox(height: 12),
-                      _buildStoryClause('I want to', story.action.isNotEmpty ? story.action : '...'),
+                      _buildStoryClause(
+                        'I want to',
+                        story.action.isNotEmpty ? story.action : '...',
+                      ),
                       const SizedBox(height: 12),
                       const Divider(height: 1, color: Color(0xFFF9FAFB)),
                       const SizedBox(height: 12),
-                      _buildStoryClause('So that', story.reason.isNotEmpty ? story.reason : '...'),
+                      _buildStoryClause(
+                        'So that',
+                        story.reason.isNotEmpty ? story.reason : '...',
+                      ),
                     ],
                   ),
                 ),
@@ -175,15 +180,17 @@ class StoryTab extends StatelessWidget {
               physics: const NeverScrollableScrollPhysics(),
               padding: EdgeInsets.zero,
               children: [
-                ...story.acceptanceCriteria.map((ac) => Column(
-                  children: [
-                    AcceptanceCriteriaItem(
-                      criteriaText: ac,
-                      testCaseCount: 0,
-                    ),
-                    const Divider(height: 1, color: Color(0xFFF9FAFB)),
-                  ],
-                )),
+                ...story.acceptanceCriteria.map(
+                  (ac) => Column(
+                    children: [
+                      AcceptanceCriteriaItem(
+                        criteriaText: ac.content,
+                        testCaseCount: 0,
+                      ),
+                      const Divider(height: 1, color: Color(0xFFF9FAFB)),
+                    ],
+                  ),
+                ),
                 Container(
                   color: Colors.grey[50], // Very light gray background
                   padding: const EdgeInsets.symmetric(

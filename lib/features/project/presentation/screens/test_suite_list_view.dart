@@ -40,7 +40,7 @@ class _TestSuiteListViewState extends State<TestSuiteListView>
       curve: Curves.easeOut,
     );
     _animController.forward();
-    
+
     // Fetch suites
     context.read<ProjectBloc>().add(GetTestSuitesEvent(widget.projectId));
   }
@@ -55,7 +55,9 @@ class _TestSuiteListViewState extends State<TestSuiteListView>
     var filtered = suites.where((s) {
       if (_searchQuery.isNotEmpty) {
         return s.name.toLowerCase().contains(_searchQuery.toLowerCase()) ||
-            (s.description ?? '').toLowerCase().contains(_searchQuery.toLowerCase());
+            (s.description ?? '').toLowerCase().contains(
+              _searchQuery.toLowerCase(),
+            );
       }
       return true;
     }).toList();
@@ -91,7 +93,10 @@ class _TestSuiteListViewState extends State<TestSuiteListView>
             ),
           ),
           padding: EdgeInsets.only(
-            left: 24, right: 24, top: 20, bottom: bottomInset + 24,
+            left: 24,
+            right: 24,
+            top: 20,
+            bottom: bottomInset + 24,
           ),
           child: Form(
             key: formKey,
@@ -119,25 +124,38 @@ class _TestSuiteListViewState extends State<TestSuiteListView>
                           color: AppColors.primary.withOpacity(0.1),
                           borderRadius: BorderRadius.circular(12),
                         ),
-                        child: const Icon(Icons.library_books, color: AppColors.primary, size: 22),
+                        child: const Icon(
+                          Icons.library_books,
+                          color: AppColors.primary,
+                          size: 22,
+                        ),
                       ),
                       const SizedBox(width: 12),
                       const Text(
                         'Create Test Suite',
-                        style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: AppColors.textDark),
+                        style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                          color: AppColors.textDark,
+                        ),
                       ),
                     ],
                   ),
                   const SizedBox(height: 24),
                   TextFormField(
                     controller: nameController,
-                    decoration: const InputDecoration(labelText: 'Suite Name *'),
-                    validator: (v) => (v == null || v.isEmpty) ? 'Required' : null,
+                    decoration: const InputDecoration(
+                      labelText: 'Suite Name *',
+                    ),
+                    validator: (v) =>
+                        (v == null || v.isEmpty) ? 'Required' : null,
                   ),
                   const SizedBox(height: 16),
                   TextFormField(
                     controller: descController,
-                    decoration: const InputDecoration(labelText: 'Description (Optional)'),
+                    decoration: const InputDecoration(
+                      labelText: 'Description (Optional)',
+                    ),
                     maxLines: 3,
                   ),
                   const SizedBox(height: 28),
@@ -147,16 +165,28 @@ class _TestSuiteListViewState extends State<TestSuiteListView>
                     child: ElevatedButton(
                       onPressed: () {
                         if (formKey.currentState?.validate() ?? false) {
-                          context.read<ProjectBloc>().add(CreateTestSuiteEvent(
-                            projectId: widget.projectId,
-                            name: nameController.text.trim(),
-                            description: descController.text.trim().isEmpty ? null : descController.text.trim(),
-                          ));
+                          context.read<ProjectBloc>().add(
+                            CreateTestSuiteEvent(
+                              projectId: widget.projectId,
+                              name: nameController.text.trim(),
+                              description: descController.text.trim().isEmpty
+                                  ? null
+                                  : descController.text.trim(),
+                            ),
+                          );
                           Navigator.pop(ctx);
                         }
                       },
-                      style: ElevatedButton.styleFrom(backgroundColor: AppColors.primary),
-                      child: const Text('Create Suite', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: AppColors.primary,
+                      ),
+                      child: const Text(
+                        'Create Suite',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
                     ),
                   ),
                 ],
@@ -173,7 +203,9 @@ class _TestSuiteListViewState extends State<TestSuiteListView>
     return BlocListener<ProjectBloc, ProjectState>(
       listener: (context, state) {
         if (state is TestSuiteCreated) {
-          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Suite created!')));
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(const SnackBar(content: Text('Suite created!')));
           context.read<ProjectBloc>().add(GetTestSuitesEvent(widget.projectId));
         }
       },
@@ -195,13 +227,14 @@ class _TestSuiteListViewState extends State<TestSuiteListView>
                   _buildStatsRow(suites),
                   const SizedBox(height: 16),
                   Expanded(
-                    child: suites.isEmpty 
-                      ? _buildEmptyState() 
-                      : ListView.builder(
-                          padding: const EdgeInsets.symmetric(horizontal: 16),
-                          itemCount: suites.length,
-                          itemBuilder: (context, index) => _buildSuiteCard(suites[index], index),
-                        ),
+                    child: suites.isEmpty
+                        ? _buildEmptyState()
+                        : ListView.builder(
+                            padding: const EdgeInsets.symmetric(horizontal: 16),
+                            itemCount: suites.length,
+                            itemBuilder: (context, index) =>
+                                _buildSuiteCard(suites[index], index),
+                          ),
                   ),
                 ],
               );
@@ -226,7 +259,10 @@ class _TestSuiteListViewState extends State<TestSuiteListView>
                 prefixIcon: const Icon(Icons.search),
                 filled: true,
                 fillColor: Colors.white,
-                border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: BorderSide.none,
+                ),
               ),
             ),
           ),
@@ -234,7 +270,12 @@ class _TestSuiteListViewState extends State<TestSuiteListView>
           IconButton(
             onPressed: _showCreateSuiteSheet,
             icon: const Icon(Icons.add, color: Colors.white),
-            style: IconButton.styleFrom(backgroundColor: AppColors.primary, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))),
+            style: IconButton.styleFrom(
+              backgroundColor: AppColors.primary,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+            ),
           ),
         ],
       ),
@@ -278,13 +319,29 @@ class _TestSuiteListViewState extends State<TestSuiteListView>
   Widget _buildStatCard(String label, Color color) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-      decoration: BoxDecoration(color: color.withOpacity(0.1), borderRadius: BorderRadius.circular(20)),
-      child: Text(label, style: TextStyle(color: color, fontWeight: FontWeight.bold, fontSize: 12)),
+      decoration: BoxDecoration(
+        color: color.withOpacity(0.1),
+        borderRadius: BorderRadius.circular(20),
+      ),
+      child: Text(
+        label,
+        style: TextStyle(
+          color: color,
+          fontWeight: FontWeight.bold,
+          fontSize: 12,
+        ),
+      ),
     );
   }
 
   Widget _buildSuiteCard(TestSuiteEntity suite, int index) {
-    final colors = [Colors.blue, Colors.green, Colors.orange, Colors.red, Colors.purple];
+    final colors = [
+      Colors.blue,
+      Colors.green,
+      Colors.orange,
+      Colors.red,
+      Colors.purple,
+    ];
     final color = colors[index % colors.length];
 
     return Container(
@@ -298,11 +355,20 @@ class _TestSuiteListViewState extends State<TestSuiteListView>
         onTap: () {}, // Detail view
         leading: Container(
           padding: const EdgeInsets.all(8),
-          decoration: BoxDecoration(color: color.withOpacity(0.1), borderRadius: BorderRadius.circular(8)),
+          decoration: BoxDecoration(
+            color: color.withOpacity(0.1),
+            borderRadius: BorderRadius.circular(8),
+          ),
           child: Icon(Icons.library_books, color: color),
         ),
-        title: Text(suite.name, style: const TextStyle(fontWeight: FontWeight.bold)),
-        subtitle: Text('${suite.count} Test Cases • ${_formatDate(suite.createdAt)}', style: const TextStyle(fontSize: 12)),
+        title: Text(
+          suite.name,
+          style: const TextStyle(fontWeight: FontWeight.bold),
+        ),
+        subtitle: Text(
+          '${suite.count} Test Cases • ${_formatDate(suite.createdAt)}',
+          style: const TextStyle(fontSize: 12),
+        ),
         trailing: const Icon(Icons.chevron_right, color: AppColors.border),
       ),
     );

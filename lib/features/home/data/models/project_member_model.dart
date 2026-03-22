@@ -10,10 +10,12 @@ class ProjectMemberModel extends ProjectMemberEntity {
 
   factory ProjectMemberModel.fromJson(Map<String, dynamic> json) {
     return ProjectMemberModel(
-      id: json['id'],
-      userId: json['userId'],
+      id: json['projectMemberId'] ?? '',
+      userId: json['userId'] ?? '',
       role: json['role'] ?? 'MEMBER',
-      joinedAt: DateTime.parse(json['joinedAt']),
+      joinedAt: json['joinedAt'] != null
+          ? DateTime.parse(json['joinedAt'])
+          : DateTime.now(),
     );
   }
 }

@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../core/constants/app_colors.dart';
+import '../bloc/test_case_bloc.dart';
+import '../bloc/test_case_event.dart';
+import '../bloc/test_case_state.dart';
 
 class CreateManualTestCasePage extends StatefulWidget {
   final String storyId;
@@ -12,7 +16,8 @@ class CreateManualTestCasePage extends StatefulWidget {
   });
 
   @override
-  State<CreateManualTestCasePage> createState() => _CreateManualTestCasePageState();
+  State<CreateManualTestCasePage> createState() =>
+      _CreateManualTestCasePageState();
 }
 
 class _CreateManualTestCasePageState extends State<CreateManualTestCasePage> {
@@ -20,29 +25,126 @@ class _CreateManualTestCasePageState extends State<CreateManualTestCasePage> {
 
   String? _selectedAC;
   String? _selectedType = 'Functional';
-  List<String> _testSteps = [''];
+  final TextEditingController _titleController = TextEditingController();
+  final TextEditingController _preconditionsController =
+      TextEditingController();
+  final TextEditingController _expectedResultController =
+      TextEditingController();
+  final List<TextEditingController> _stepControllers = [
+    TextEditingController(),
+  ];
+
+  @override
+  void dispose() {
+    _titleController.dispose();
+    _preconditionsController.dispose();
+    _expectedResultController.dispose();
+    for (var controller in _stepControllers) {
+      controller.dispose();
+    }
+    super.dispose();
+  }
+
+  void _submit() {
+    if (_formKey.currentState!.validate()) {
+      if (_titleController.text.trim().isEmpty) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(const SnackBar(content: Text('Please enter a title')));
+        return;
+      }
+
+      final steps = _stepControllers
+          .map((c) => c.text.trim())
+          .where((text) => text.isNotEmpty)
+          .toList();
+
+      if (steps.isEmpty) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Please enter at least one test step')),
+        );
+        return;
+      }
+
+      if (_expectedResultController.text.trim().isEmpty) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Please enter expected result')),
+        );
+        return;
+      }
+
+      context.read<TestCaseBloc>().add(
+        CreateTestCaseEvent(
+          title: _titleController.text.trim(),
+          type: _selectedType ?? 'Functional',
+          preconditions: _preconditionsController.text.trim().isNotEmpty
+              ? _preconditionsController.text.trim()
+              : null,
+          steps: steps,
+          expectedResult: _expectedResultController.text.trim(),
+          userStoryId: widget.storyId,
+          acceptanceCriteriaId:
+              _selectedAC, // Assuming the name acts as ID for now or adjust based on backend
+        ),
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.white,
-      appBar: _buildAppBar(),
-      body: SingleChildScrollView(
-        child: Form(
-          key: _formKey,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              _buildSection1BasicInfo(),
-              _buildSection2Setup(),
-              _buildSection3TestSteps(),
-              _buildSection4ExpectedResult(),
-              const SizedBox(height: 100), // Padding for bottom bar
-            ],
-          ),
-        ),
-      ),
-      bottomSheet: _buildBottomCreateAction(),
+    return BlocConsumer<TestCaseBloc, TestCaseState>(
+      listener: (context, state) {
+        if (state is TestCaseCreateSuccess) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Test case created successfully!')),
+          );
+          context.read<TestCaseBloc>().add(
+            GetTestCasesEvent(userStoryId: widget.storyId),
+          );
+          Navigator.of(context).pop();
+        } else if (state is TestCaseCreateError) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Failed to create test case: ${state.message}'),
+            ),
+          );
+        }
+      },
+      builder: (context, state) {
+        return Stack(
+          children: [
+            Scaffold(
+              backgroundColor: Colors.white,
+              appBar: _buildAppBar(),
+              body: SingleChildScrollView(
+                child: Form(
+                  key: _formKey,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      _buildSection1BasicInfo(),
+                      _buildSection2Setup(),
+                      _buildSection3TestSteps(),
+                      _buildSection4ExpectedResult(),
+                      const SizedBox(height: 100), // Padding for bottom bar
+                    ],
+                  ),
+                ),
+              ),
+              bottomSheet: _buildBottomCreateAction(
+                state is TestCaseCreateLoading,
+              ),
+            ),
+            if (state is TestCaseCreateLoading)
+              Container(
+                color: Colors.black.withOpacity(0.3),
+                child: const Center(
+                  child: CircularProgressIndicator(color: AppColors.primary),
+                ),
+              ),
+          ],
+        );
+      },
     );
   }
 
@@ -109,20 +211,32 @@ class _CreateManualTestCasePageState extends State<CreateManualTestCasePage> {
             decoration: InputDecoration(
               filled: true,
               fillColor: Colors.grey[50],
-              contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+              contentPadding: const EdgeInsets.symmetric(
+                horizontal: 16,
+                vertical: 12,
+              ),
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(8),
                 borderSide: BorderSide.none,
               ),
               focusedBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(8),
-                borderSide: BorderSide(color: AppColors.primary.withOpacity(0.5), width: 2),
+                borderSide: BorderSide(
+                  color: AppColors.primary.withOpacity(0.5),
+                  width: 2,
+                ),
               ),
               hintText: 'Select linked Acceptance Criteria',
               hintStyle: TextStyle(color: Colors.grey[400], fontSize: 14),
             ),
             items: [
-              const DropdownMenuItem(value: null, child: Text('Select Requirement', style: TextStyle(color: Colors.grey))),
+              const DropdownMenuItem(
+                value: null,
+                child: Text(
+                  'Select Requirement',
+                  style: TextStyle(color: Colors.grey),
+                ),
+              ),
               ...widget.acceptanceCriteria.map((ac) {
                 return DropdownMenuItem(
                   value: ac,
@@ -142,6 +256,7 @@ class _CreateManualTestCasePageState extends State<CreateManualTestCasePage> {
 
           // Title
           TextFormField(
+            controller: _titleController,
             style: const TextStyle(
               fontSize: 20,
               fontWeight: FontWeight.bold,
@@ -154,9 +269,15 @@ class _CreateManualTestCasePageState extends State<CreateManualTestCasePage> {
                 fontWeight: FontWeight.bold,
                 color: Color(0xFFCBD5E1),
               ),
-              border: UnderlineInputBorder(borderSide: BorderSide(color: Color(0xFFF1F5F9), width: 2)),
-              enabledBorder: UnderlineInputBorder(borderSide: BorderSide(color: Color(0xFFF1F5F9), width: 2)),
-              focusedBorder: UnderlineInputBorder(borderSide: BorderSide(color: AppColors.primary, width: 2)),
+              border: UnderlineInputBorder(
+                borderSide: BorderSide(color: Color(0xFFF1F5F9), width: 2),
+              ),
+              enabledBorder: UnderlineInputBorder(
+                borderSide: BorderSide(color: Color(0xFFF1F5F9), width: 2),
+              ),
+              focusedBorder: UnderlineInputBorder(
+                borderSide: BorderSide(color: AppColors.primary, width: 2),
+              ),
               contentPadding: EdgeInsets.symmetric(vertical: 8),
             ),
           ),
@@ -188,14 +309,35 @@ class _CreateManualTestCasePageState extends State<CreateManualTestCasePage> {
                   child: DropdownButtonFormField<String>(
                     value: _selectedType,
                     decoration: const InputDecoration(
-                      contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+                      contentPadding: EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 12,
+                      ),
                       border: InputBorder.none,
                     ),
                     items: const [
-                      DropdownMenuItem(value: 'Functional', child: Text('Functional', style: TextStyle(fontSize: 14))),
-                      DropdownMenuItem(value: 'UI/UX', child: Text('UI/UX', style: TextStyle(fontSize: 14))),
-                      DropdownMenuItem(value: 'Performance', child: Text('Performance', style: TextStyle(fontSize: 14))),
-                      DropdownMenuItem(value: 'Security', child: Text('Security', style: TextStyle(fontSize: 14))),
+                      DropdownMenuItem(
+                        value: 'Functional',
+                        child: Text(
+                          'Functional',
+                          style: TextStyle(fontSize: 14),
+                        ),
+                      ),
+                      DropdownMenuItem(
+                        value: 'UI/UX',
+                        child: Text('UI/UX', style: TextStyle(fontSize: 14)),
+                      ),
+                      DropdownMenuItem(
+                        value: 'Performance',
+                        child: Text(
+                          'Performance',
+                          style: TextStyle(fontSize: 14),
+                        ),
+                      ),
+                      DropdownMenuItem(
+                        value: 'Security',
+                        child: Text('Security', style: TextStyle(fontSize: 14)),
+                      ),
                     ],
                     onChanged: (val) {
                       setState(() => _selectedType = val);
@@ -244,9 +386,16 @@ class _CreateManualTestCasePageState extends State<CreateManualTestCasePage> {
             collapsedIconColor: Colors.grey[400],
             childrenPadding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
             children: [
-              _buildSetupField('Preconditions', 'Enter preconditions...'),
+              _buildSetupField(
+                'Preconditions',
+                'Enter preconditions...',
+                controller: _preconditionsController,
+              ),
               const SizedBox(height: 16),
-              _buildSetupField('Test Data', 'Define test datasets...'),
+              _buildSetupField(
+                'Test Data',
+                'Define test datasets...',
+              ), // Keep un-controller if we don't have it in API
             ],
           ),
         ),
@@ -254,7 +403,11 @@ class _CreateManualTestCasePageState extends State<CreateManualTestCasePage> {
     );
   }
 
-  Widget _buildSetupField(String label, String hint) {
+  Widget _buildSetupField(
+    String label,
+    String hint, {
+    TextEditingController? controller,
+  }) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -268,6 +421,7 @@ class _CreateManualTestCasePageState extends State<CreateManualTestCasePage> {
         ),
         const SizedBox(height: 6),
         TextFormField(
+          controller: controller,
           maxLines: 2,
           decoration: InputDecoration(
             hintText: hint,
@@ -281,7 +435,10 @@ class _CreateManualTestCasePageState extends State<CreateManualTestCasePage> {
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(8),
-              borderSide: BorderSide(color: AppColors.primary.withOpacity(0.5), width: 2),
+              borderSide: BorderSide(
+                color: AppColors.primary.withOpacity(0.5),
+                width: 2,
+              ),
             ),
           ),
         ),
@@ -316,7 +473,7 @@ class _CreateManualTestCasePageState extends State<CreateManualTestCasePage> {
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Text(
-                  '${_testSteps.length} STEPS',
+                  '${_stepControllers.length} STEPS',
                   style: const TextStyle(
                     fontSize: 10,
                     fontWeight: FontWeight.bold,
@@ -330,7 +487,7 @@ class _CreateManualTestCasePageState extends State<CreateManualTestCasePage> {
           ListView.builder(
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
-            itemCount: _testSteps.length,
+            itemCount: _stepControllers.length,
             itemBuilder: (context, index) {
               return Padding(
                 padding: const EdgeInsets.only(bottom: 12.0),
@@ -359,9 +516,13 @@ class _CreateManualTestCasePageState extends State<CreateManualTestCasePage> {
                         ),
                         Expanded(
                           child: TextFormField(
+                            controller: _stepControllers[index],
                             maxLines: 2,
                             minLines: 1,
-                            style: const TextStyle(fontSize: 14, color: Color(0xFF334155)),
+                            style: const TextStyle(
+                              fontSize: 14,
+                              color: Color(0xFF334155),
+                            ),
                             decoration: InputDecoration(
                               hintText: 'Describe the action...',
                               hintStyle: TextStyle(color: Colors.grey[400]),
@@ -371,16 +532,20 @@ class _CreateManualTestCasePageState extends State<CreateManualTestCasePage> {
                             ),
                           ),
                         ),
-                        if (_testSteps.length > 1)
+                        if (_stepControllers.length > 1)
                           InkWell(
                             onTap: () {
                               setState(() {
-                                _testSteps.removeAt(index);
+                                _stepControllers.removeAt(index).dispose();
                               });
                             },
                             child: const Padding(
                               padding: EdgeInsets.only(left: 8.0),
-                              child: Icon(Icons.delete_outline, color: Colors.redAccent, size: 20),
+                              child: Icon(
+                                Icons.delete_outline,
+                                color: Colors.redAccent,
+                                size: 20,
+                              ),
                             ),
                           ),
                       ],
@@ -393,10 +558,14 @@ class _CreateManualTestCasePageState extends State<CreateManualTestCasePage> {
           TextButton.icon(
             onPressed: () {
               setState(() {
-                _testSteps.add('');
+                _stepControllers.add(TextEditingController());
               });
             },
-            icon: const Icon(Icons.add_circle, color: AppColors.primary, size: 20),
+            icon: const Icon(
+              Icons.add_circle,
+              color: AppColors.primary,
+              size: 20,
+            ),
             label: const Text(
               'Add Test Step',
               style: TextStyle(
@@ -440,11 +609,18 @@ class _CreateManualTestCasePageState extends State<CreateManualTestCasePage> {
               children: [
                 // Toolbar
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 8,
+                    vertical: 4,
+                  ),
                   decoration: BoxDecoration(
                     color: Colors.grey[50],
-                    border: Border(bottom: BorderSide(color: Colors.grey[200]!)),
-                    borderRadius: const BorderRadius.vertical(top: Radius.circular(11)),
+                    border: Border(
+                      bottom: BorderSide(color: Colors.grey[200]!),
+                    ),
+                    borderRadius: const BorderRadius.vertical(
+                      top: Radius.circular(11),
+                    ),
                   ),
                   child: Row(
                     children: [
@@ -463,6 +639,7 @@ class _CreateManualTestCasePageState extends State<CreateManualTestCasePage> {
                 ),
                 // Input
                 TextFormField(
+                  controller: _expectedResultController,
                   maxLines: 4,
                   minLines: 3,
                   decoration: InputDecoration(
@@ -491,7 +668,7 @@ class _CreateManualTestCasePageState extends State<CreateManualTestCasePage> {
     );
   }
 
-  Widget _buildBottomCreateAction() {
+  Widget _buildBottomCreateAction(bool isLoading) {
     return Container(
       decoration: BoxDecoration(
         color: Colors.white.withOpacity(0.95),
@@ -500,10 +677,7 @@ class _CreateManualTestCasePageState extends State<CreateManualTestCasePage> {
       padding: const EdgeInsets.all(16),
       child: SafeArea(
         child: ElevatedButton(
-          onPressed: () {
-            // Create test case action
-            Navigator.of(context).pop();
-          },
+          onPressed: isLoading ? null : _submit,
           style: ElevatedButton.styleFrom(
             backgroundColor: AppColors.primary,
             foregroundColor: Colors.white,
@@ -514,13 +688,19 @@ class _CreateManualTestCasePageState extends State<CreateManualTestCasePage> {
             elevation: 4,
             shadowColor: AppColors.primary.withOpacity(0.4),
           ),
-          child: const Text(
-            'Create Test Case',
-            style: TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
+          child: isLoading
+              ? const SizedBox(
+                  width: 24,
+                  height: 24,
+                  child: CircularProgressIndicator(
+                    color: Colors.white,
+                    strokeWidth: 2,
+                  ),
+                )
+              : const Text(
+                  'Create Test Case',
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                ),
         ),
       ),
     );

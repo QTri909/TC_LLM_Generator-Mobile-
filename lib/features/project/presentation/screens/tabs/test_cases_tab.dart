@@ -1,15 +1,19 @@
 import 'package:flutter/material.dart';
 import '../../../../../core/constants/app_colors.dart';
-import '../../models/mock_models.dart';class TestCasesTab extends StatelessWidget {
-  final List<TestCaseMock> testCases;
+import '../../../domain/entities/test_case_entity.dart';
+
+class TestCasesTab extends StatelessWidget {
+  final List<TestCaseEntity> testCases;
   final bool isSelectionMode;
+  final Set<String> selectedTestCaseIds;
   final VoidCallback onSelectionModeActivated;
-  final Function(TestCaseMock, bool) onToggleSelection;
+  final Function(TestCaseEntity, bool) onToggleSelection;
 
   const TestCasesTab({
     super.key,
     required this.testCases,
     required this.isSelectionMode,
+    required this.selectedTestCaseIds,
     required this.onSelectionModeActivated,
     required this.onToggleSelection,
   });
@@ -26,7 +30,11 @@ import '../../models/mock_models.dart';class TestCasesTab extends StatelessWidge
             children: [
               Row(
                 children: [
-                  const Icon(Icons.auto_awesome, color: AppColors.primary, size: 20),
+                  const Icon(
+                    Icons.auto_awesome,
+                    color: AppColors.primary,
+                    size: 20,
+                  ),
                   const SizedBox(width: 8),
                   const Text(
                     'AI-Generated Test Cases',
@@ -60,7 +68,8 @@ import '../../models/mock_models.dart';class TestCasesTab extends StatelessWidge
           shrinkWrap: true,
           physics: const NeverScrollableScrollPhysics(),
           itemCount: testCases.length,
-          separatorBuilder: (context, index) => const Divider(height: 1, color: Color(0xFFDBE0E6)),
+          separatorBuilder: (context, index) =>
+              const Divider(height: 1, color: Color(0xFFDBE0E6)),
           itemBuilder: (context, index) {
             final tc = testCases[index];
             return InkWell(
@@ -72,12 +81,15 @@ import '../../models/mock_models.dart';class TestCasesTab extends StatelessWidge
               },
               onTap: () {
                 if (isSelectionMode) {
-                  onToggleSelection(tc, !tc.isSelected);
+                  onToggleSelection(tc, !selectedTestCaseIds.contains(tc.id));
                 }
               },
               child: Container(
                 color: Colors.white,
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 12,
+                ),
                 constraints: const BoxConstraints(minHeight: 88),
                 child: Row(
                   children: [
@@ -88,12 +100,14 @@ import '../../models/mock_models.dart';class TestCasesTab extends StatelessWidge
                           height: 24,
                           width: 24,
                           child: Checkbox(
-                            value: tc.isSelected,
+                            value: selectedTestCaseIds.contains(tc.id),
                             onChanged: (val) {
                               onToggleSelection(tc, val ?? false);
                             },
                             activeColor: AppColors.primary,
-                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(4),
+                            ),
                           ),
                         ),
                       ),

@@ -162,8 +162,10 @@ class _CreateProjectPageState extends State<CreateProjectPage>
                         padding: EdgeInsets.only(left: 2),
                         child: Text(
                           'Define rules and constraints for this project.',
-                          style:
-                              TextStyle(fontSize: 13, color: AppColors.textGrey),
+                          style: TextStyle(
+                            fontSize: 13,
+                            color: AppColors.textGrey,
+                          ),
                         ),
                       ),
                       const SizedBox(height: 24),
@@ -213,8 +215,7 @@ class _CreateProjectPageState extends State<CreateProjectPage>
                                     horizontal: 12,
                                   ),
                                   decoration: BoxDecoration(
-                                    border:
-                                        Border.all(color: AppColors.border),
+                                    border: Border.all(color: AppColors.border),
                                     borderRadius: BorderRadius.circular(12),
                                     color: Colors.white,
                                   ),
@@ -235,18 +236,17 @@ class _CreateProjectPageState extends State<CreateProjectPage>
                                                   Icon(
                                                     p <= 2
                                                         ? Icons
-                                                            .keyboard_double_arrow_up
+                                                              .keyboard_double_arrow_up
                                                         : p == 3
-                                                            ? Icons
-                                                                .drag_handle
-                                                            : Icons
-                                                                .keyboard_double_arrow_down,
+                                                        ? Icons.drag_handle
+                                                        : Icons
+                                                              .keyboard_double_arrow_down,
                                                     size: 16,
                                                     color: p <= 2
                                                         ? Colors.red
                                                         : p == 3
-                                                            ? Colors.orange
-                                                            : Colors.green,
+                                                        ? Colors.orange
+                                                        : Colors.green,
                                                   ),
                                                   const SizedBox(width: 8),
                                                   Text(
@@ -286,8 +286,7 @@ class _CreateProjectPageState extends State<CreateProjectPage>
                                     horizontal: 12,
                                   ),
                                   decoration: BoxDecoration(
-                                    border:
-                                        Border.all(color: AppColors.border),
+                                    border: Border.all(color: AppColors.border),
                                     borderRadius: BorderRadius.circular(12),
                                     color: Colors.white,
                                   ),
@@ -307,25 +306,27 @@ class _CreateProjectPageState extends State<CreateProjectPage>
                                         Icons.unfold_more,
                                         color: AppColors.textGrey,
                                       ),
-                                      items: [
-                                        'Stakeholder',
-                                        'Regulation',
-                                        'UX Research',
-                                        'Technical',
-                                        'Other',
-                                      ]
-                                          .map(
-                                            (s) => DropdownMenuItem<String>(
-                                              value: s,
-                                              child: Text(
-                                                s,
-                                                style: const TextStyle(
-                                                  fontWeight: FontWeight.w500,
+                                      items:
+                                          [
+                                                'Stakeholder',
+                                                'Regulation',
+                                                'UX Research',
+                                                'Technical',
+                                                'Other',
+                                              ]
+                                              .map(
+                                                (s) => DropdownMenuItem<String>(
+                                                  value: s,
+                                                  child: Text(
+                                                    s,
+                                                    style: const TextStyle(
+                                                      fontWeight:
+                                                          FontWeight.w500,
+                                                    ),
+                                                  ),
                                                 ),
-                                              ),
-                                            ),
-                                          )
-                                          .toList(),
+                                              )
+                                              .toList(),
                                       onChanged: (val) {
                                         if (val != null) {
                                           setSheetState(
@@ -356,8 +357,8 @@ class _CreateProjectPageState extends State<CreateProjectPage>
                                   'title': _ruleTitleController.text.trim(),
                                   'description':
                                       _ruleDescController.text.trim().isEmpty
-                                          ? null
-                                          : _ruleDescController.text.trim(),
+                                      ? null
+                                      : _ruleDescController.text.trim(),
                                   'priority': localPriority,
                                   'source': localSource.isEmpty
                                       ? null
@@ -555,8 +556,7 @@ class _CreateProjectPageState extends State<CreateProjectPage>
                                 decoration: BoxDecoration(
                                   color: AppColors.backgroundLight,
                                   borderRadius: BorderRadius.circular(12),
-                                  border:
-                                      Border.all(color: AppColors.border),
+                                  border: Border.all(color: AppColors.border),
                                 ),
                                 child: Row(
                                   children: [
@@ -578,8 +578,9 @@ class _CreateProjectPageState extends State<CreateProjectPage>
                                         color: _projectKey.isEmpty
                                             ? AppColors.textGrey
                                             : AppColors.primary,
-                                        letterSpacing:
-                                            _projectKey.isEmpty ? 0 : 1.2,
+                                        letterSpacing: _projectKey.isEmpty
+                                            ? 0
+                                            : 1.2,
                                       ),
                                     ),
                                     if (_projectKey.isNotEmpty) ...[
@@ -590,10 +591,12 @@ class _CreateProjectPageState extends State<CreateProjectPage>
                                           vertical: 4,
                                         ),
                                         decoration: BoxDecoration(
-                                          color: AppColors.primary
-                                              .withOpacity(0.1),
-                                          borderRadius:
-                                              BorderRadius.circular(6),
+                                          color: AppColors.primary.withOpacity(
+                                            0.1,
+                                          ),
+                                          borderRadius: BorderRadius.circular(
+                                            6,
+                                          ),
                                         ),
                                         child: const Text(
                                           'AUTO',
@@ -653,15 +656,12 @@ class _CreateProjectPageState extends State<CreateProjectPage>
                               if (_businessRules.isEmpty)
                                 _buildEmptyRulesState()
                               else
-                                ..._businessRules
-                                    .asMap()
-                                    .entries
-                                    .map(
-                                      (entry) => _buildBusinessRuleCard(
-                                        entry.key,
-                                        entry.value,
-                                      ),
-                                    ),
+                                ..._businessRules.asMap().entries.map(
+                                  (entry) => _buildBusinessRuleCard(
+                                    entry.key,
+                                    entry.value,
+                                  ),
+                                ),
                             ],
                           ),
 
@@ -694,10 +694,7 @@ class _CreateProjectPageState extends State<CreateProjectPage>
                                       mainAxisAlignment:
                                           MainAxisAlignment.center,
                                       children: [
-                                        Icon(
-                                          Icons.rocket_launch,
-                                          size: 20,
-                                        ),
+                                        Icon(Icons.rocket_launch, size: 20),
                                         SizedBox(width: 10),
                                         Text(
                                           'Create Project',
@@ -717,8 +714,9 @@ class _CreateProjectPageState extends State<CreateProjectPage>
                             width: double.infinity,
                             height: 48,
                             child: TextButton(
-                              onPressed:
-                                  isLoading ? null : () => Navigator.pop(context),
+                              onPressed: isLoading
+                                  ? null
+                                  : () => Navigator.pop(context),
                               child: const Text(
                                 'Cancel',
                                 style: TextStyle(
@@ -869,10 +867,7 @@ class _CreateProjectPageState extends State<CreateProjectPage>
             )
           : null,
       prefixIconConstraints: const BoxConstraints(minWidth: 0, minHeight: 0),
-      contentPadding: const EdgeInsets.symmetric(
-        horizontal: 16,
-        vertical: 16,
-      ),
+      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
       border: OutlineInputBorder(
         borderRadius: BorderRadius.circular(12),
         borderSide: const BorderSide(color: AppColors.border),
@@ -934,8 +929,8 @@ class _CreateProjectPageState extends State<CreateProjectPage>
     final priorityColor = (rule['priority'] as int) <= 2
         ? Colors.red
         : (rule['priority'] as int) == 3
-            ? Colors.orange
-            : Colors.green;
+        ? Colors.orange
+        : Colors.green;
 
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
@@ -951,10 +946,7 @@ class _CreateProjectPageState extends State<CreateProjectPage>
           Row(
             children: [
               Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 8,
-                  vertical: 3,
-                ),
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                 decoration: BoxDecoration(
                   color: priorityColor.withOpacity(0.1),
                   borderRadius: BorderRadius.circular(6),
@@ -1020,10 +1012,7 @@ class _CreateProjectPageState extends State<CreateProjectPage>
             const SizedBox(height: 4),
             Text(
               rule['description'],
-              style: const TextStyle(
-                fontSize: 13,
-                color: AppColors.textGrey,
-              ),
+              style: const TextStyle(fontSize: 13, color: AppColors.textGrey),
               maxLines: 2,
               overflow: TextOverflow.ellipsis,
             ),

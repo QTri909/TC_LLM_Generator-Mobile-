@@ -12,8 +12,6 @@ class CreateStoryUseCase {
     required String role,
     required String action,
     required String reason,
-    required String priority,
-    required int points,
     required List<String> acceptanceCriteria,
   }) async {
     return repository.createStory(
@@ -22,8 +20,6 @@ class CreateStoryUseCase {
       role: role,
       action: action,
       reason: reason,
-      priority: priority,
-      points: points,
       acceptanceCriteria: acceptanceCriteria,
     );
   }

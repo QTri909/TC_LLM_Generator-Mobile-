@@ -13,13 +13,19 @@ class TestPlanModel extends TestPlanEntity {
 
   factory TestPlanModel.fromJson(Map<String, dynamic> json) {
     return TestPlanModel(
-      id: json['id'],
-      projectId: json['projectId'],
-      name: json['name'],
+      id: json['testPlanId'] ?? '',
+      projectId: json['projectId'] ?? '',
+      name: json['name'] ?? '',
       description: json['description'],
-      status: json['status'],
-      createdAt: DateTime.parse(json['createdAt']),
-      suiteIds: List<String>.from(json['suites'] ?? []),
+      status: json['status'] ?? 'DRAFT',
+      createdAt: json['createdAt'] != null
+          ? DateTime.parse(json['createdAt'])
+          : DateTime.now(),
+      suiteIds:
+          (json['suiteIds'] as List<dynamic>?)
+              ?.map((e) => e.toString())
+              .toList() ??
+          [],
     );
   }
 

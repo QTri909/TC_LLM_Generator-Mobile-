@@ -42,4 +42,3 @@ class WorkspaceRepositoryImpl implements WorkspaceRepository {
     );
   }
 }
-

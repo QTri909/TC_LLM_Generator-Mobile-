@@ -9,7 +9,7 @@ class AuthRemoteDataSource {
   AuthRemoteDataSource({required this.client});
 
   Future<AuthResponseModel> loginWithGoogle(String idToken) async {
-    final baseUrl = dotenv.env['BASE_URL'] ?? 'http://10.0.2.2:3000';
+    final baseUrl = dotenv.env['BASE_URL'] ?? 'http://10.0.2.2:8080';
     final response = await client.post(
       Uri.parse('$baseUrl/api/v1/auth/login-google'),
       headers: {'Content-Type': 'application/json'},

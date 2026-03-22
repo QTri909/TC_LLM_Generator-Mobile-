@@ -4,7 +4,9 @@ import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import '../bloc/project_bloc.dart';
 import '../../../../core/constants/app_colors.dart';
 import '../../domain/entities/story_entity.dart';
-import '../models/mock_models.dart';
+import '../bloc/test_case_bloc.dart';
+import '../bloc/test_case_event.dart';
+import '../bloc/test_case_state.dart';
 import 'create_manual_test_case_page.dart';
 import 'tabs/story_tab.dart';
 import 'tabs/test_cases_tab.dart';
@@ -27,14 +29,15 @@ class StoryDetailPage extends StatefulWidget {
 class _StoryDetailPageState extends State<StoryDetailPage> {
   int _selectedTabIndex = 0; // 0: Story, 1: Test Case, 2: Test Plan
   bool _isSelectionMode = false;
-  
-  final List<TestCaseMock> _mockTestCases = [
-    TestCaseMock(id: 'TC-01', title: 'Successful Login', type: 'Positive', description: 'Verifies standard login flow with correct user data'),
-    TestCaseMock(id: 'TC-02', title: 'Invalid Password Error', type: 'Negative', description: 'Ensures system rejects incorrect credentials'),
-    TestCaseMock(id: 'TC-03', title: 'Character Limit', type: 'Boundary', description: 'Maximum character limit for username field'),
-    TestCaseMock(id: 'TC-04', title: 'SQL Injection Test', type: 'Security', description: 'Check input sanitation on username field'),
-    TestCaseMock(id: 'TC-05', title: 'Remember Me Toggle', type: 'Positive', description: 'Session persistence across browser restarts'),
-  ];
+  final Set<String> _selectedTestCaseIds = {};
+
+  @override
+  void initState() {
+    super.initState();
+    context.read<TestCaseBloc>().add(
+      GetTestCasesEvent(userStoryId: widget.story.id),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -53,22 +56,12 @@ class _StoryDetailPageState extends State<StoryDetailPage> {
           Expanded(
             child: SingleChildScrollView(
               child: _selectedTabIndex == 0
-                  ? StoryTab(story: widget.story, projectName: widget.projectName)
-                  : _selectedTabIndex == 1
-                  ? TestCasesTab(
-                      testCases: _mockTestCases,
-                      isSelectionMode: _isSelectionMode,
-                      onSelectionModeActivated: () {
-                        setState(() {
-                          _isSelectionMode = true;
-                        });
-                      },
-                      onToggleSelection: (tc, isSelected) {
-                        setState(() {
-                          tc.isSelected = isSelected;
-                        });
-                      },
+                  ? StoryTab(
+                      story: widget.story,
+                      projectName: widget.projectName,
                     )
+                  : _selectedTabIndex == 1
+                  ? _buildTestCasesTabContent()
                   : const Center(child: Text("Test Plan Tab WIP")),
             ),
           ),
@@ -90,18 +83,21 @@ class _StoryDetailPageState extends State<StoryDetailPage> {
               onPressed: () {
                 setState(() {
                   _isSelectionMode = false;
-                  for (var tc in _mockTestCases) {
-                    tc.isSelected = false;
-                  }
+                  _selectedTestCaseIds.clear();
                 });
               },
             )
           : IconButton(
-              icon: const Icon(Icons.arrow_back_ios_new, color: Color(0xFF111418)),
+              icon: const Icon(
+                Icons.arrow_back_ios_new,
+                color: Color(0xFF111418),
+              ),
               onPressed: () => Navigator.of(context).pop(),
             ),
       title: Column(
-        crossAxisAlignment: isTestCaseTab ? CrossAxisAlignment.start : CrossAxisAlignment.center,
+        crossAxisAlignment: isTestCaseTab
+            ? CrossAxisAlignment.start
+            : CrossAxisAlignment.center,
         children: [
           Text(
             'Project: ${widget.projectName}'.toUpperCase(),
@@ -124,18 +120,7 @@ class _StoryDetailPageState extends State<StoryDetailPage> {
         ],
       ),
       actions: [
-        if (isTestCaseTab && _isSelectionMode)
-          TextButton(
-            onPressed: () {
-              setState(() {
-                for (var tc in _mockTestCases) {
-                  tc.isSelected = true;
-                }
-              });
-            },
-            child: const Text('Select all', style: TextStyle(color: AppColors.primary, fontWeight: FontWeight.bold)),
-          )
-        else if (isTestCaseTab && !_isSelectionMode)
+        if (isTestCaseTab && !_isSelectionMode)
           IconButton(
             icon: const Icon(Icons.search, color: Color(0xFF111418)),
             onPressed: () {},
@@ -233,20 +218,26 @@ class _StoryDetailPageState extends State<StoryDetailPage> {
           child: const Icon(Icons.auto_awesome, color: AppColors.primary),
           backgroundColor: Colors.white,
           label: 'Generate with AI',
-          labelStyle: const TextStyle(fontSize: 14.0, fontWeight: FontWeight.bold),
+          labelStyle: const TextStyle(
+            fontSize: 14.0,
+            fontWeight: FontWeight.bold,
+          ),
           onTap: () {},
         ),
         SpeedDialChild(
           child: const Icon(Icons.edit, color: AppColors.primary),
           backgroundColor: Colors.white,
           label: 'Write Manually',
-          labelStyle: const TextStyle(fontSize: 14.0, fontWeight: FontWeight.bold),
+          labelStyle: const TextStyle(
+            fontSize: 14.0,
+            fontWeight: FontWeight.bold,
+          ),
           onTap: () {
             Navigator.of(context).push(
               MaterialPageRoute(
                 builder: (context) => CreateManualTestCasePage(
                   storyId: widget.story.id,
-                  acceptanceCriteria: widget.story.acceptanceCriteria,
+                  acceptanceCriteria: widget.story.acceptanceCriteria.map((ac) => ac.content).toList(),
                 ),
                 fullscreenDialog: true,
               ),
@@ -258,7 +249,7 @@ class _StoryDetailPageState extends State<StoryDetailPage> {
   }
 
   Widget _buildSelectionBottomBar() {
-    int selectedCount = _mockTestCases.where((tc) => tc.isSelected).length;
+    int selectedCount = _selectedTestCaseIds.length;
     return Container(
       decoration: BoxDecoration(
         color: Colors.white,
@@ -285,9 +276,7 @@ class _StoryDetailPageState extends State<StoryDetailPage> {
                   onTap: () {
                     setState(() {
                       _isSelectionMode = false;
-                      for (var tc in _mockTestCases) {
-                        tc.isSelected = false;
-                      }
+                      _selectedTestCaseIds.clear();
                     });
                   },
                   child: Text(
@@ -302,27 +291,27 @@ class _StoryDetailPageState extends State<StoryDetailPage> {
               ],
             ),
             ElevatedButton.icon(
-              onPressed: selectedCount == 0 ? null : () {
-                showDialog(
-                  context: context,
-                  builder: (dialogContext) => BlocProvider.value(
-                    value: context.read<ProjectBloc>(),
-                    child: AddToSuiteDialog(
-                      selectedCount: selectedCount,
-                      projectId: widget.story.projectId,
-                    ),
-                  ),
-                ).then((value) {
-                  if (value == true) {
-                    setState(() {
-                      _isSelectionMode = false;
-                      for (var tc in _mockTestCases) {
-                        tc.isSelected = false;
-                      }
-                    });
-                  }
-                });
-              },
+              onPressed: selectedCount == 0
+                  ? null
+                  : () {
+                      showDialog(
+                        context: context,
+                        builder: (dialogContext) => BlocProvider.value(
+                          value: context.read<ProjectBloc>(),
+                          child: AddToSuiteDialog(
+                            selectedCount: selectedCount,
+                            projectId: widget.story.projectId,
+                          ),
+                        ),
+                      ).then((value) {
+                        if (value == true) {
+                          setState(() {
+                            _isSelectionMode = false;
+                            _selectedTestCaseIds.clear();
+                          });
+                        }
+                      });
+                    },
               icon: const Icon(Icons.library_add, size: 20),
               label: const Text('Add to Suite'),
               style: ElevatedButton.styleFrom(
@@ -332,7 +321,10 @@ class _StoryDetailPageState extends State<StoryDetailPage> {
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12),
                 ),
-                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 24,
+                  vertical: 12,
+                ),
                 textStyle: const TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.bold,
@@ -342,6 +334,57 @@ class _StoryDetailPageState extends State<StoryDetailPage> {
           ],
         ),
       ),
+    );
+  }
+
+  Widget _buildTestCasesTabContent() {
+    return BlocBuilder<TestCaseBloc, TestCaseState>(
+      builder: (context, state) {
+        if (state is TestCasesLoading) {
+          return const Center(
+            child: Padding(
+              padding: EdgeInsets.all(32.0),
+              child: CircularProgressIndicator(color: AppColors.primary),
+            ),
+          );
+        } else if (state is TestCasesError) {
+          return Center(
+            child: Text(
+              'Error: ${state.message}',
+              style: const TextStyle(color: Colors.red),
+            ),
+          );
+        } else if (state is TestCasesLoaded) {
+          if (state.testCases.isEmpty) {
+            return const Center(
+              child: Padding(
+                padding: EdgeInsets.all(32.0),
+                child: Text('No test cases yet. Generate or create one.'),
+              ),
+            );
+          }
+          return TestCasesTab(
+            testCases: state.testCases,
+            isSelectionMode: _isSelectionMode,
+            selectedTestCaseIds: _selectedTestCaseIds,
+            onSelectionModeActivated: () {
+              setState(() {
+                _isSelectionMode = true;
+              });
+            },
+            onToggleSelection: (tc, isSelected) {
+              setState(() {
+                if (isSelected) {
+                  _selectedTestCaseIds.add(tc.id);
+                } else {
+                  _selectedTestCaseIds.remove(tc.id);
+                }
+              });
+            },
+          );
+        }
+        return const SizedBox();
+      },
     );
   }
 }

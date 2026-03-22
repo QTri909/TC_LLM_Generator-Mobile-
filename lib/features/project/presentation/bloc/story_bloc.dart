@@ -8,27 +8,31 @@ class StoryBloc extends Bloc<StoryEvent, StoryState> {
   final CreateStoryUseCase createStoryUseCase;
   final GetStoriesUseCase getStoriesUseCase;
 
-  StoryBloc({
-    required this.createStoryUseCase,
-    required this.getStoriesUseCase,
-  }) : super(StoryInitial()) {
+  StoryBloc({required this.createStoryUseCase, required this.getStoriesUseCase})
+    : super(StoryInitial()) {
     on<GetStoriesEvent>(_onGetStories);
     on<CreateStoryEvent>(_onCreateStory);
   }
 
   Future<void> _onGetStories(
-      GetStoriesEvent event, Emitter<StoryState> emit) async {
+    GetStoriesEvent event,
+    Emitter<StoryState> emit,
+  ) async {
     emit(StoriesLoading());
     try {
       final stories = await getStoriesUseCase(event.projectId);
-      emit(StoriesLoaded(stories: stories.reversed.toList())); // Reversed to show new at the top (head asc)
+      emit(
+        StoriesLoaded(stories: stories.reversed.toList()),
+      ); // Reversed to show new at the top (head asc)
     } catch (e) {
       emit(StoriesError(message: e.toString()));
     }
   }
 
   Future<void> _onCreateStory(
-      CreateStoryEvent event, Emitter<StoryState> emit) async {
+    CreateStoryEvent event,
+    Emitter<StoryState> emit,
+  ) async {
     emit(StoryCreateLoading());
     try {
       final story = await createStoryUseCase(
@@ -37,8 +41,6 @@ class StoryBloc extends Bloc<StoryEvent, StoryState> {
         role: event.role,
         action: event.action,
         reason: event.reason,
-        priority: event.priority,
-        points: event.points,
         acceptanceCriteria: event.acceptanceCriteria,
       );
       emit(StoryCreateSuccess(story: story));

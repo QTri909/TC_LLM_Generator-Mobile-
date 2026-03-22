@@ -42,7 +42,9 @@ class _ProjectDetailPageState extends State<ProjectDetailPage> {
     super.initState();
     final client = http.Client();
     final remoteDataSource = ProjectRemoteDataSource(client: client);
-    final repository = ProjectRepositoryImpl(remoteDataSource: remoteDataSource);
+    final repository = ProjectRepositoryImpl(
+      remoteDataSource: remoteDataSource,
+    );
     final getStoriesUseCase = GetStoriesUseCase(repository);
     final createStoryUseCase = CreateStoryUseCase(repository);
 
@@ -87,7 +89,7 @@ class _ProjectDetailPageState extends State<ProjectDetailPage> {
     if (_bottomNavIndex == 1) {
       return TestPlanListView(projectId: widget.project.id);
     }
-    
+
     // Project Tab (index 0)
     return Column(
       children: [
@@ -101,21 +103,29 @@ class _ProjectDetailPageState extends State<ProjectDetailPage> {
                   return const Center(child: CircularProgressIndicator());
                 } else if (state is StoriesError) {
                   return Center(child: Text('Error: ${state.message}'));
-                } else if (state is StoriesLoaded || state is StoryCreateSuccess) {
+                } else if (state is StoriesLoaded ||
+                    state is StoryCreateSuccess) {
                   List<StoryEntity> stories = [];
                   if (state is StoriesLoaded) {
                     stories = state.stories;
                   } else if (state is StoryCreateSuccess) {
-                    _storyBloc.add(GetStoriesEvent(projectId: widget.project.id));
+                    _storyBloc.add(
+                      GetStoriesEvent(projectId: widget.project.id),
+                    );
                     return const Center(child: CircularProgressIndicator());
                   }
 
                   if (stories.isEmpty) {
-                    return const Center(child: Text('No stories found. Create one!'));
+                    return const Center(
+                      child: Text('No stories found. Create one!'),
+                    );
                   }
 
                   return ListView.builder(
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 8,
+                    ),
                     itemCount: stories.length,
                     itemBuilder: (context, index) {
                       return Padding(
@@ -125,7 +135,7 @@ class _ProjectDetailPageState extends State<ProjectDetailPage> {
                     },
                   );
                 }
-                
+
                 return const SizedBox();
               },
             ),
@@ -144,22 +154,24 @@ class _ProjectDetailPageState extends State<ProjectDetailPage> {
 
   Widget? _buildFAB() {
     if (_bottomNavIndex != 0 || !_isRepositoryActive) return null;
-    
+
     return FloatingActionButton(
       onPressed: () {
-        Navigator.of(context).push(
-          MaterialPageRoute(
-            builder: (context) {
-              return BlocProvider.value(
-                value: _storyBloc,
-                child: CreateStoryPage(projectId: widget.project.id),
-              );
-            },
-            fullscreenDialog: true,
-          ),
-        ).then((_) {
-          _storyBloc.add(GetStoriesEvent(projectId: widget.project.id));
-        });
+        Navigator.of(context)
+            .push(
+              MaterialPageRoute(
+                builder: (context) {
+                  return BlocProvider.value(
+                    value: _storyBloc,
+                    child: CreateStoryPage(projectId: widget.project.id),
+                  );
+                },
+                fullscreenDialog: true,
+              ),
+            )
+            .then((_) {
+              _storyBloc.add(GetStoriesEvent(projectId: widget.project.id));
+            });
       },
       backgroundColor: AppColors.primary,
       child: const Icon(Icons.add, color: Colors.white, size: 32),
@@ -355,9 +367,10 @@ class _ProjectDetailPageState extends State<ProjectDetailPage> {
   Widget _buildStoryCard(StoryEntity story) {
     bool isExpanded = _expandedStates[story.id] ?? false;
     MaterialColor color = Colors.blue;
-    if (story.priority == 'High') color = Colors.orange;
-    if (story.priority == 'Medium') color = Colors.blue;
-    if (story.priority == 'Low') color = Colors.grey;
+    if (story.status == 'DRAFT') color = Colors.grey;
+    if (story.status == 'READY') color = Colors.green;
+    if (story.status == 'IN_PROGRESS') color = Colors.blue;
+    if (story.status == 'DONE') color = Colors.purple;
 
     bool isAiReady = story.acceptanceCriteria.isNotEmpty;
 
@@ -512,15 +525,15 @@ class _ProjectDetailPageState extends State<ProjectDetailPage> {
                 ],
               ),
               const SizedBox(height: 12),
-              ...story.acceptanceCriteria.map((text) {
+              ...story.acceptanceCriteria.take(3).map((ac) {
                 return Padding(
                   padding: const EdgeInsets.only(bottom: 8.0),
-                  child: _buildChecklistItem(text, false),
+                  child: _buildChecklistItem(ac.content, false),
                 );
               }).toList(),
             ] else ...[
               const SizedBox(height: 8),
-              if (story.role.isNotEmpty && story.action.isNotEmpty) 
+              if (story.role.isNotEmpty && story.action.isNotEmpty)
                 Text(
                   'As a ${story.role}, I want to ${story.action}...',
                   maxLines: 2,
@@ -619,21 +632,21 @@ class _ProjectDetailPageState extends State<ProjectDetailPage> {
       onTap: (index) => setState(() => _bottomNavIndex = index),
       selectedItemColor: AppColors.primary,
       unselectedItemColor: Colors.grey[400],
-      selectedLabelStyle: const TextStyle(fontWeight: FontWeight.bold, fontSize: 10),
-      unselectedLabelStyle: const TextStyle(fontWeight: FontWeight.bold, fontSize: 10),
+      selectedLabelStyle: const TextStyle(
+        fontWeight: FontWeight.bold,
+        fontSize: 10,
+      ),
+      unselectedLabelStyle: const TextStyle(
+        fontWeight: FontWeight.bold,
+        fontSize: 10,
+      ),
       items: const [
-        BottomNavigationBarItem(
-          icon: Icon(Icons.grid_view),
-          label: 'PROJECT',
-        ),
+        BottomNavigationBarItem(icon: Icon(Icons.grid_view), label: 'PROJECT'),
         BottomNavigationBarItem(
           icon: Icon(Icons.assignment),
           label: 'TEST PLAN',
         ),
-        BottomNavigationBarItem(
-          icon: Icon(Icons.settings),
-          label: 'SETTINGS',
-        ),
+        BottomNavigationBarItem(icon: Icon(Icons.settings), label: 'SETTINGS'),
       ],
     );
   }

@@ -79,7 +79,9 @@ class _TestPlanListViewState extends State<TestPlanListView> {
               backgroundColor: AppColors.primary,
               foregroundColor: Colors.white,
               elevation: 0,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8),
+              ),
             ),
           ),
         ],
@@ -108,7 +110,11 @@ class _TestPlanListViewState extends State<TestPlanListView> {
                     color: Colors.orange.withOpacity(0.1),
                     borderRadius: BorderRadius.circular(8),
                   ),
-                  child: const Icon(Icons.assignment, color: Colors.orange, size: 20),
+                  child: const Icon(
+                    Icons.assignment,
+                    color: Colors.orange,
+                    size: 20,
+                  ),
                 ),
                 const SizedBox(width: 12),
                 Expanded(
@@ -125,7 +131,10 @@ class _TestPlanListViewState extends State<TestPlanListView> {
                       ),
                       Text(
                         'Created on ${_formatDate(plan.createdAt)}',
-                        style: const TextStyle(fontSize: 12, color: AppColors.textGrey),
+                        style: const TextStyle(
+                          fontSize: 12,
+                          color: AppColors.textGrey,
+                        ),
                       ),
                     ],
                   ),
@@ -147,7 +156,11 @@ class _TestPlanListViewState extends State<TestPlanListView> {
             const SizedBox(height: 12),
             Row(
               children: [
-                const Icon(Icons.library_books, size: 16, color: AppColors.textGrey),
+                const Icon(
+                  Icons.library_books,
+                  size: 16,
+                  color: AppColors.textGrey,
+                ),
                 const SizedBox(width: 8),
                 Text(
                   '${plan.suiteIds.length} Test Suites included',
@@ -166,7 +179,11 @@ class _TestPlanListViewState extends State<TestPlanListView> {
                     color: AppColors.primary,
                   ),
                 ),
-                const Icon(Icons.chevron_right, size: 16, color: AppColors.primary),
+                const Icon(
+                  Icons.chevron_right,
+                  size: 16,
+                  color: AppColors.primary,
+                ),
               ],
             ),
           ],
@@ -206,7 +223,11 @@ class _TestPlanListViewState extends State<TestPlanListView> {
           const SizedBox(height: 16),
           const Text(
             'No test plans found',
-            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: AppColors.textGrey),
+            style: TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+              color: AppColors.textGrey,
+            ),
           ),
           const SizedBox(height: 8),
           const Text(

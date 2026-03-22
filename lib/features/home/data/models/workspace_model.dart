@@ -14,8 +14,8 @@ class WorkspaceModel extends WorkspaceEntity {
 
   factory WorkspaceModel.fromJson(Map<String, dynamic> json) {
     return WorkspaceModel(
-      id: json['id'] ?? '',
-      ownerId: json['ownerId'] ?? '',
+      id: json['workspaceId'] ?? '',
+      ownerId: json['ownerUserId'] ?? '',
       name: json['name'] ?? 'Unnamed Workspace',
       description: json['description'],
       createdAt: json['createdAt'] != null

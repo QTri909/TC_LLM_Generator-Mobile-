@@ -71,4 +71,3 @@ class CreateProjectEvent extends WorkspaceEvent {
     if (description != null) description!,
   ];
 }
-

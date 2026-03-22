@@ -96,198 +96,202 @@ class _CreateWorkspaceSheetState extends State<CreateWorkspaceSheet> {
 
           return Form(
             key: _formKey,
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // Handle at the top
-                Center(
-                  child: Container(
-                    width: 48,
-                    height: 4,
-                    margin: const EdgeInsets.only(bottom: 24),
-                    decoration: BoxDecoration(
-                      color: AppColors.border,
-                      borderRadius: BorderRadius.circular(2),
-                    ),
-                  ),
-                ),
-                const Text(
-                  'Create Workspace',
-                  style: TextStyle(
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
-                    color: AppColors.textDark,
-                  ),
-                ),
-                const SizedBox(height: 4),
-                const Text(
-                  'Set up a new environment for your QA team.',
-                  style: TextStyle(fontSize: 14, color: AppColors.textGrey),
-                ),
-                const SizedBox(height: 24),
-
-                // Workspace Name Label
-                RichText(
-                  text: const TextSpan(
-                    text: 'Workspace Name ',
-                    style: TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w600,
-                      color: AppColors.textDark,
-                      fontFamily: 'Inter',
-                    ),
-                    children: [
-                      TextSpan(
-                        text: '*',
-                        style: TextStyle(color: Colors.red),
-                      ),
-                    ],
-                  ),
-                ),
-                const SizedBox(height: 8),
-                TextFormField(
-                  controller: _nameController,
-                  enabled: !isLoading,
-                  decoration: InputDecoration(
-                    hintText: 'e.g. Project Apollo',
-                    hintStyle: const TextStyle(color: AppColors.textGrey),
-                    filled: true,
-                    fillColor: Colors.white,
-                    contentPadding: const EdgeInsets.symmetric(
-                      horizontal: 16,
-                      vertical: 16,
-                    ),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                      borderSide: const BorderSide(color: AppColors.border),
-                    ),
-                    enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                      borderSide: const BorderSide(color: AppColors.border),
-                    ),
-                    focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                      borderSide: const BorderSide(
-                        color: AppColors.primary,
-                        width: 2,
+            child: SingleChildScrollView(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Handle at the top
+                  Center(
+                    child: Container(
+                      width: 48,
+                      height: 4,
+                      margin: const EdgeInsets.only(bottom: 24),
+                      decoration: BoxDecoration(
+                        color: AppColors.border,
+                        borderRadius: BorderRadius.circular(2),
                       ),
                     ),
                   ),
-                  validator: (value) {
-                    if (value == null || value.trim().isEmpty) {
-                      return 'Workspace name is required';
-                    }
-                    return null;
-                  },
-                ),
-                const SizedBox(height: 20),
-
-                // Description Label
-                RichText(
-                  text: const TextSpan(
-                    text: 'Description ',
+                  const Text(
+                    'Create Workspace',
                     style: TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w600,
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
                       color: AppColors.textDark,
-                      fontFamily: 'Inter',
                     ),
-                    children: [
-                      TextSpan(
-                        text: '(Optional)',
-                        style: TextStyle(
-                          color: AppColors.textGrey,
-                          fontWeight: FontWeight.normal,
+                  ),
+                  const SizedBox(height: 4),
+                  const Text(
+                    'Set up a new environment for your QA team.',
+                    style: TextStyle(fontSize: 14, color: AppColors.textGrey),
+                  ),
+                  const SizedBox(height: 24),
+
+                  // Workspace Name Label
+                  RichText(
+                    text: const TextSpan(
+                      text: 'Workspace Name ',
+                      style: TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w600,
+                        color: AppColors.textDark,
+                        fontFamily: 'Inter',
+                      ),
+                      children: [
+                        TextSpan(
+                          text: '*',
+                          style: TextStyle(color: Colors.red),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  TextFormField(
+                    controller: _nameController,
+                    enabled: !isLoading,
+                    decoration: InputDecoration(
+                      hintText: 'e.g. Project Apollo',
+                      hintStyle: const TextStyle(color: AppColors.textGrey),
+                      filled: true,
+                      fillColor: Colors.white,
+                      contentPadding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 16,
+                      ),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: const BorderSide(color: AppColors.border),
+                      ),
+                      enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: const BorderSide(color: AppColors.border),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: const BorderSide(
+                          color: AppColors.primary,
+                          width: 2,
                         ),
                       ),
-                    ],
+                    ),
+                    validator: (value) {
+                      if (value == null || value.trim().isEmpty) {
+                        return 'Workspace name is required';
+                      }
+                      return null;
+                    },
                   ),
-                ),
-                const SizedBox(height: 8),
-                TextFormField(
-                  controller: _descController,
-                  enabled: !isLoading,
-                  maxLines: 3,
-                  decoration: InputDecoration(
-                    hintText: 'What will this workspace be used for?',
-                    hintStyle: const TextStyle(color: AppColors.textGrey),
-                    filled: true,
-                    fillColor: Colors.white,
-                    contentPadding: const EdgeInsets.symmetric(
-                      horizontal: 16,
-                      vertical: 16,
-                    ),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                      borderSide: const BorderSide(color: AppColors.border),
-                    ),
-                    enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                      borderSide: const BorderSide(color: AppColors.border),
-                    ),
-                    focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                      borderSide: const BorderSide(
-                        color: AppColors.primary,
-                        width: 2,
-                      ),
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 24),
+                  const SizedBox(height: 20),
 
-                // Create Button
-                SizedBox(
-                  width: double.infinity,
-                  height: 56,
-                  child: ElevatedButton(
-                    onPressed: isLoading ? null : _submit,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: AppColors.primary,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(16),
-                      ),
-                      elevation: 0,
-                    ),
-                    child: isLoading
-                        ? const SizedBox(
-                            height: 24,
-                            width: 24,
-                            child: CircularProgressIndicator(
-                              color: Colors.white,
-                              strokeWidth: 2,
-                            ),
-                          )
-                        : const Text(
-                            'Create Workspace',
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                  ),
-                ),
-                const SizedBox(height: 12),
-
-                // Cancel Button
-                SizedBox(
-                  width: double.infinity,
-                  height: 56,
-                  child: TextButton(
-                    onPressed: isLoading ? null : () => Navigator.pop(context),
-                    child: const Text(
-                      'Cancel',
+                  // Description Label
+                  RichText(
+                    text: const TextSpan(
+                      text: 'Description ',
                       style: TextStyle(
-                        color: AppColors.textGrey,
-                        fontSize: 16,
+                        fontSize: 14,
                         fontWeight: FontWeight.w600,
+                        color: AppColors.textDark,
+                        fontFamily: 'Inter',
+                      ),
+                      children: [
+                        TextSpan(
+                          text: '(Optional)',
+                          style: TextStyle(
+                            color: AppColors.textGrey,
+                            fontWeight: FontWeight.normal,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  TextFormField(
+                    controller: _descController,
+                    enabled: !isLoading,
+                    maxLines: 3,
+                    decoration: InputDecoration(
+                      hintText: 'What will this workspace be used for?',
+                      hintStyle: const TextStyle(color: AppColors.textGrey),
+                      filled: true,
+                      fillColor: Colors.white,
+                      contentPadding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 16,
+                      ),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: const BorderSide(color: AppColors.border),
+                      ),
+                      enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: const BorderSide(color: AppColors.border),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: const BorderSide(
+                          color: AppColors.primary,
+                          width: 2,
+                        ),
                       ),
                     ),
                   ),
-                ),
-              ],
+                  const SizedBox(height: 24),
+
+                  // Create Button
+                  SizedBox(
+                    width: double.infinity,
+                    height: 56,
+                    child: ElevatedButton(
+                      onPressed: isLoading ? null : _submit,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: AppColors.primary,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(16),
+                        ),
+                        elevation: 0,
+                      ),
+                      child: isLoading
+                          ? const SizedBox(
+                              height: 24,
+                              width: 24,
+                              child: CircularProgressIndicator(
+                                color: Colors.white,
+                                strokeWidth: 2,
+                              ),
+                            )
+                          : const Text(
+                              'Create Workspace',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+
+                  // Cancel Button
+                  SizedBox(
+                    width: double.infinity,
+                    height: 56,
+                    child: TextButton(
+                      onPressed: isLoading
+                          ? null
+                          : () => Navigator.pop(context),
+                      child: const Text(
+                        'Cancel',
+                        style: TextStyle(
+                          color: AppColors.textGrey,
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
             ),
           );
         },

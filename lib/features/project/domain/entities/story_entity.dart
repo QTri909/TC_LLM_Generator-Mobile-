@@ -1,4 +1,5 @@
 import 'package:equatable/equatable.dart';
+import 'acceptance_criteria_entity.dart';
 
 class StoryEntity extends Equatable {
   final String id;
@@ -7,9 +8,9 @@ class StoryEntity extends Equatable {
   final String role;
   final String action;
   final String reason;
-  final String priority;
-  final int points;
-  final List<String> acceptanceCriteria;
+  final String status;
+  final List<AcceptanceCriteriaEntity> acceptanceCriteria;
+  final DateTime? createdAt;
 
   const StoryEntity({
     required this.id,
@@ -18,9 +19,9 @@ class StoryEntity extends Equatable {
     required this.role,
     required this.action,
     required this.reason,
-    required this.priority,
-    required this.points,
+    required this.status,
     required this.acceptanceCriteria,
+    this.createdAt,
   });
 
   @override
@@ -31,8 +32,8 @@ class StoryEntity extends Equatable {
         role,
         action,
         reason,
-        priority,
-        points,
+        status,
         acceptanceCriteria,
+        createdAt,
       ];
 }

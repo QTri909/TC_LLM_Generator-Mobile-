@@ -33,4 +33,3 @@ class TestSuiteMock {
     this.isSelected = false,
   }) : createdAt = createdAt ?? DateTime.now();
 }
-

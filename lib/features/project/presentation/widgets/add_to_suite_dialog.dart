@@ -37,17 +37,24 @@ class _AddToSuiteDialogState extends State<AddToSuiteDialog> {
         if (state is ProjectLoading) {
           return const Center(child: CircularProgressIndicator());
         } else if (state is TestSuitesLoaded) {
-          final suites = state.suites.where(
-            (s) => s.name.toLowerCase().contains(_searchQuery.toLowerCase())
-          ).toList();
+          final suites = state.suites
+              .where(
+                (s) =>
+                    s.name.toLowerCase().contains(_searchQuery.toLowerCase()),
+              )
+              .toList();
 
           int selectedSuitesCount = _selectionMap.values.where((v) => v).length;
 
           return Dialog(
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(16),
+            ),
             backgroundColor: Colors.white,
             child: Container(
-              constraints: BoxConstraints(maxHeight: MediaQuery.of(context).size.height * 0.7),
+              constraints: BoxConstraints(
+                maxHeight: MediaQuery.of(context).size.height * 0.7,
+              ),
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
@@ -71,9 +78,15 @@ class _AddToSuiteDialogState extends State<AddToSuiteDialog> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text('Add to Test Suites', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+          const Text(
+            'Add to Test Suites',
+            style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+          ),
           const SizedBox(height: 4),
-          Text('Select suites for ${widget.selectedCount} cases', style: const TextStyle(color: AppColors.textGrey)),
+          Text(
+            'Select suites for ${widget.selectedCount} cases',
+            style: const TextStyle(color: AppColors.textGrey),
+          ),
         ],
       ),
     );
@@ -89,7 +102,10 @@ class _AddToSuiteDialogState extends State<AddToSuiteDialog> {
           prefixIcon: const Icon(Icons.search),
           filled: true,
           fillColor: Colors.grey[100],
-          border: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: BorderSide.none),
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(8),
+            borderSide: BorderSide.none,
+          ),
         ),
       ),
     );
@@ -104,7 +120,8 @@ class _AddToSuiteDialogState extends State<AddToSuiteDialog> {
         final isSelected = _selectionMap[suite.id] ?? false;
         return CheckboxListTile(
           value: isSelected,
-          onChanged: (val) => setState(() => _selectionMap[suite.id] = val ?? false),
+          onChanged: (val) =>
+              setState(() => _selectionMap[suite.id] = val ?? false),
           title: Text(suite.name),
           subtitle: Text('${suite.count} test cases'),
           activeColor: AppColors.primary,
@@ -118,18 +135,38 @@ class _AddToSuiteDialogState extends State<AddToSuiteDialog> {
       padding: const EdgeInsets.all(16),
       child: Row(
         children: [
-          Expanded(child: OutlinedButton(onPressed: () => Navigator.pop(context), child: const Text('Cancel'))),
+          Expanded(
+            child: OutlinedButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('Cancel'),
+            ),
+          ),
           const SizedBox(width: 12),
           Expanded(
             child: ElevatedButton(
-              onPressed: selectedCount == 0 ? null : () {
-                Navigator.pop(context, true);
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text('${widget.selectedCount} test case(s) added to $selectedCount suite(s)'), backgroundColor: Colors.green),
-                );
-              },
-              style: ElevatedButton.styleFrom(backgroundColor: AppColors.primary),
-              child: Text('Add ($selectedCount)', style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+              onPressed: selectedCount == 0
+                  ? null
+                  : () {
+                      Navigator.pop(context, true);
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text(
+                            '${widget.selectedCount} test case(s) added to $selectedCount suite(s)',
+                          ),
+                          backgroundColor: Colors.green,
+                        ),
+                      );
+                    },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppColors.primary,
+              ),
+              child: Text(
+                'Add ($selectedCount)',
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
             ),
           ),
         ],

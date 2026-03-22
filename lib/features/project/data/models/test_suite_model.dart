@@ -13,13 +13,15 @@ class TestSuiteModel extends TestSuiteEntity {
 
   factory TestSuiteModel.fromJson(Map<String, dynamic> json) {
     return TestSuiteModel(
-      id: json['id'],
-      projectId: json['projectId'],
-      name: json['name'],
+      id: json['testSuiteId'] ?? '',
+      projectId: json['projectId'] ?? '',
+      name: json['name'] ?? '',
       description: json['description'],
-      count: json['count'] ?? 0,
-      testCaseIds: List<String>.from(json['testCaseIds'] ?? []),
-      createdAt: DateTime.parse(json['createdAt']),
+      count: (json['testCaseCount'] as num?)?.toInt() ?? 0,
+      testCaseIds: [], // Backend doesn't return IDs in the suite list
+      createdAt: json['createdAt'] != null
+          ? DateTime.parse(json['createdAt'])
+          : DateTime.now(),
     );
   }
 
