@@ -39,6 +39,11 @@ class AuthRepositoryImpl implements AuthRepository {
   }
 
   @override
+  Future<AuthEntity> loginWithEmailPassword(String email, String password) async {
+    return await remoteDataSource.loginWithEmailPassword(email, password);
+  }
+
+  @override
   Future<void> saveTokens(String accessToken, String refreshToken) async {
     await localDataSource.saveTokens(
       accessToken: accessToken,

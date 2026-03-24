@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import '../../../../../core/constants/app_colors.dart';
-import '../../../domain/entities/test_case_entity.dart';
+import 'package:automation_generate_tc/core/constants/app_colors.dart';
+import 'package:automation_generate_tc/features/project/domain/entities/test_case_entity.dart';
+import '../test_case_detail_page.dart';
 
 class TestCasesTab extends StatelessWidget {
   final List<TestCaseEntity> testCases;
@@ -82,6 +83,12 @@ class TestCasesTab extends StatelessWidget {
               onTap: () {
                 if (isSelectionMode) {
                   onToggleSelection(tc, !selectedTestCaseIds.contains(tc.id));
+                } else {
+                  Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (context) => TestCaseDetailPage(testCase: tc),
+                    ),
+                  );
                 }
               },
               child: Container(

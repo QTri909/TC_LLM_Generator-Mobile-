@@ -46,3 +46,12 @@ class CreateTestCaseEvent extends TestCaseEvent {
     acceptanceCriteriaId,
   ];
 }
+
+class GenerateTestCasesEvent extends TestCaseEvent {
+  final String userStoryId;
+
+  const GenerateTestCasesEvent({required this.userStoryId});
+
+  @override
+  List<Object?> get props => [userStoryId];
+}

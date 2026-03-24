@@ -28,6 +28,8 @@ abstract class ProjectRepository {
     String? acceptanceCriteriaId,
   });
 
+  Future<void> generateTestCases(String userStoryId);
+
   Future<List<TestSuiteEntity>> getTestSuites(String projectId);
   Future<TestSuiteEntity> createTestSuite({
     required String projectId,

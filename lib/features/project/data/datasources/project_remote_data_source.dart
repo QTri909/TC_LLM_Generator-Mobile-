@@ -8,7 +8,7 @@ import '../models/test_plan_model.dart';
 import '../models/test_case_model.dart';
 import '../models/notification_model.dart';
 import '../models/project_member_model.dart';
-import '../../../../core/network/token_storage.dart';
+import 'package:automation_generate_tc/core/network/token_storage.dart';
 
 class ProjectRemoteDataSource {
   final http.Client client;
@@ -152,6 +152,21 @@ class ProjectRemoteDataSource {
       throw Exception(
         'Failed to create test case: ${response.statusCode} - ${response.body}',
       );
+    }
+  }
+
+  Future<void> generateTestCases(String userStoryId) async {
+    final baseUrl = dotenv.env['BASE_URL'] ?? 'http://10.0.2.2:8080';
+    final response = await client.post(
+      Uri.parse(
+        '$baseUrl/api/v1/user-stories/$userStoryId/generate-test-cases',
+      ),
+      headers: TokenStorage.authHeaders,
+      body: jsonEncode({}),
+    );
+
+    if (response.statusCode != 200) {
+      throw Exception('Failed to generate test cases: ${response.body}');
     }
   }
 

@@ -63,6 +63,11 @@ class ProjectRepositoryImpl implements ProjectRepository {
   }
 
   @override
+  Future<void> generateTestCases(String userStoryId) async {
+    await remoteDataSource.generateTestCases(userStoryId);
+  }
+
+  @override
   Future<List<TestSuiteEntity>> getTestSuites(String projectId) async {
     return await remoteDataSource.getTestSuites(projectId);
   }

@@ -50,7 +50,30 @@ class _StoryDetailPageState extends State<StoryDetailPage> {
       bottomNavigationBar: (_selectedTabIndex == 1 && _isSelectionMode)
           ? _buildSelectionBottomBar()
           : null,
-      body: Column(
+      body: _buildBody(),
+    );
+  }
+
+  Widget _buildBody() {
+    return BlocListener<TestCaseBloc, TestCaseState>(
+      listener: (context, state) {
+        if (state is TestCasesGenerateSuccess) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('AI Test Cases generated successfully!'),
+              backgroundColor: Colors.green,
+            ),
+          );
+        } else if (state is TestCasesGenerateError) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Generation Error: ${state.message}'),
+              backgroundColor: Colors.red,
+            ),
+          );
+        }
+      },
+      child: Column(
         children: [
           _buildTabs(),
           Expanded(
@@ -222,7 +245,11 @@ class _StoryDetailPageState extends State<StoryDetailPage> {
             fontSize: 14.0,
             fontWeight: FontWeight.bold,
           ),
-          onTap: () {},
+          onTap: () {
+            context.read<TestCaseBloc>().add(
+              GenerateTestCasesEvent(userStoryId: widget.story.id),
+            );
+          },
         ),
         SpeedDialChild(
           child: const Icon(Icons.edit, color: AppColors.primary),
@@ -340,11 +367,26 @@ class _StoryDetailPageState extends State<StoryDetailPage> {
   Widget _buildTestCasesTabContent() {
     return BlocBuilder<TestCaseBloc, TestCaseState>(
       builder: (context, state) {
-        if (state is TestCasesLoading) {
-          return const Center(
+        if (state is TestCasesLoading || state is TestCasesGenerating) {
+          return Center(
             child: Padding(
-              padding: EdgeInsets.all(32.0),
-              child: CircularProgressIndicator(color: AppColors.primary),
+              padding: const EdgeInsets.all(32.0),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const CircularProgressIndicator(color: AppColors.primary),
+                  if (state is TestCasesGenerating) ...[
+                    const SizedBox(height: 16),
+                    const Text(
+                      'AI is generating test cases...',
+                      style: TextStyle(
+                        color: AppColors.primary,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ],
+                ],
+              ),
             ),
           );
         } else if (state is TestCasesError) {

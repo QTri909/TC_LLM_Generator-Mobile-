@@ -49,3 +49,16 @@ class TestCaseCreateError extends TestCaseState {
   @override
   List<Object?> get props => [message];
 }
+
+class TestCasesGenerating extends TestCaseState {}
+
+class TestCasesGenerateSuccess extends TestCaseState {}
+
+class TestCasesGenerateError extends TestCaseState {
+  final String message;
+
+  const TestCasesGenerateError({required this.message});
+
+  @override
+  List<Object?> get props => [message];
+}

@@ -12,6 +12,11 @@ import '../bloc/story_bloc.dart';
 import '../bloc/story_event.dart';
 import '../bloc/story_state.dart';
 import 'story_detail_page.dart';
+import '../../domain/usecases/get_test_cases_usecase.dart';
+import '../../domain/usecases/create_test_case_usecase.dart';
+import '../../domain/usecases/generate_test_cases_usecase.dart';
+import '../bloc/test_case_bloc.dart';
+import '../../domain/repositories/project_repository.dart';
 import 'create_story_page.dart';
 import 'test_suite_list_view.dart';
 import 'test_plan_list_view.dart';
@@ -35,6 +40,7 @@ class _ProjectDetailPageState extends State<ProjectDetailPage> {
   bool _isRepositoryActive = true;
   late StoryBloc _storyBloc;
   late ProjectBloc _projectBloc;
+  late ProjectRepository _repository;
   final Map<String, bool> _expandedStates = {};
 
   @override
@@ -42,11 +48,11 @@ class _ProjectDetailPageState extends State<ProjectDetailPage> {
     super.initState();
     final client = http.Client();
     final remoteDataSource = ProjectRemoteDataSource(client: client);
-    final repository = ProjectRepositoryImpl(
+    _repository = ProjectRepositoryImpl(
       remoteDataSource: remoteDataSource,
     );
-    final getStoriesUseCase = GetStoriesUseCase(repository);
-    final createStoryUseCase = CreateStoryUseCase(repository);
+    final getStoriesUseCase = GetStoriesUseCase(_repository);
+    final createStoryUseCase = CreateStoryUseCase(_repository);
 
     _storyBloc = StoryBloc(
       createStoryUseCase: createStoryUseCase,
@@ -54,10 +60,10 @@ class _ProjectDetailPageState extends State<ProjectDetailPage> {
     )..add(GetStoriesEvent(projectId: widget.project.id));
 
     _projectBloc = ProjectBloc(
-      getTestSuites: GetTestSuites(repository),
-      createTestSuite: CreateTestSuite(repository),
-      getTestPlans: GetTestPlans(repository),
-      createTestPlan: CreateTestPlan(repository),
+      getTestSuites: GetTestSuites(_repository),
+      createTestSuite: CreateTestSuite(_repository),
+      getTestPlans: GetTestPlans(_repository),
+      createTestPlan: CreateTestPlan(_repository),
     );
   }
 
@@ -378,8 +384,18 @@ class _ProjectDetailPageState extends State<ProjectDetailPage> {
       onTap: () {
         Navigator.of(context).push(
           MaterialPageRoute(
-            builder: (innerContext) => BlocProvider.value(
-              value: _projectBloc,
+            builder: (innerContext) => MultiBlocProvider(
+              providers: [
+                BlocProvider.value(value: _projectBloc),
+                BlocProvider(
+                  create: (context) => TestCaseBloc(
+                    getTestCasesUseCase: GetTestCasesUseCase(_repository),
+                    createTestCaseUseCase: CreateTestCaseUseCase(_repository),
+                    generateTestCasesUseCase:
+                        GenerateTestCasesUseCase(_repository),
+                  ),
+                ),
+              ],
               child: StoryDetailPage(
                 story: story,
                 projectName: widget.project.name,

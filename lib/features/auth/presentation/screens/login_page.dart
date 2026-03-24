@@ -23,6 +23,15 @@ class LoginPage extends StatefulWidget {
 
 class _LoginPageState extends State<LoginPage> {
   bool _isPasswordVisible = false;
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
+
+  @override
+  void dispose() {
+    _emailController.dispose();
+    _passwordController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -76,6 +85,7 @@ class _LoginPageState extends State<LoginPage> {
               _buildLabel('Email Address'),
               const SizedBox(height: 8),
               TextField(
+                controller: _emailController,
                 decoration: _buildInputDecoration('Enter your email'),
                 keyboardType: TextInputType.emailAddress,
               ),
@@ -105,6 +115,7 @@ class _LoginPageState extends State<LoginPage> {
               ),
               const SizedBox(height: 8),
               TextField(
+                controller: _passwordController,
                 obscureText: !_isPasswordVisible,
                 decoration: _buildInputDecoration('Enter your password')
                     .copyWith(
@@ -126,27 +137,55 @@ class _LoginPageState extends State<LoginPage> {
               const SizedBox(height: 24),
 
               // Login Button
-              SizedBox(
-                width: double.infinity,
-                height: 56,
-                child: ElevatedButton(
-                  onPressed: () {},
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.primary,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
+              BlocBuilder<AuthBloc, AuthState>(
+                builder: (context, state) {
+                  if (state is AuthLoading) {
+                    return const SizedBox(
+                      height: 56,
+                      child: Center(child: CircularProgressIndicator()),
+                    );
+                  }
+
+                  return SizedBox(
+                    width: double.infinity,
+                    height: 56,
+                    child: ElevatedButton(
+                      onPressed: () {
+                        final email = _emailController.text.trim();
+                        final password = _passwordController.text;
+                        if (email.isNotEmpty && password.isNotEmpty) {
+                          context.read<AuthBloc>().add(
+                                LoginWithEmailPasswordEvent(
+                                  email: email,
+                                  password: password,
+                                ),
+                              );
+                        } else {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text('Please enter email and password'),
+                            ),
+                          );
+                        }
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: AppColors.primary,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        elevation: 1,
+                      ),
+                      child: const Text(
+                        'Login',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
                     ),
-                    elevation: 1,
-                  ),
-                  child: const Text(
-                    'Login',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
+                  );
+                },
               ),
 
               // Divider

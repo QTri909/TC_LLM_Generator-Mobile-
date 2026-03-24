@@ -9,6 +9,7 @@ import 'package:automation_generate_tc/features/auth/data/datasources/auth_local
 import 'package:automation_generate_tc/features/auth/data/repositories/auth_repository_impl.dart';
 import 'package:automation_generate_tc/features/auth/domain/repositories/auth_repository.dart';
 import 'package:automation_generate_tc/features/auth/presentation/bloc/auth_bloc.dart';
+import 'package:automation_generate_tc/core/network/token_storage.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -47,6 +48,12 @@ class _InitializerAppState extends State<InitializerApp> {
         remoteDataSource: authRemoteDataSource,
         localDataSource: authLocalDataSource,
       );
+
+      // Initialize TokenStorage from Local Storage
+      final token = await authLocalDataSource.getAccessToken();
+      if (token != null) {
+        TokenStorage.setToken(token);
+      }
 
       // Trigger rebuild với Repository đã khởi tạo
       setState(() {
